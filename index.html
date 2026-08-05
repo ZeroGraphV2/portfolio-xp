@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>portfolio.exe</title>
+        
+        <style>
+            @keyframes popIn {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.9) translateY(20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+            }
+
+            body {
+                background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/fond-anime.gif');
+                background-size: cover;
+                background-position: center;
+                background-color: #0b0b0e;
+
+                min-height: 100vh;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-family: 'Tahoma', sans-serif;
+                overflow-x: hidden;
+                perspective: 1000px;
+            }
+
+            .wrapper-3d {
+                transform-style: preserve-3d;
+                transition: transform 0.1s ease-out;
+                width: 100%;
+                max-width: 650px;
+                padding: 15px;
+                box-sizing: border-box;
+            }
+
+            .Fenetre-XP {
+                background-color: #ece9d8;
+                border: 3px solid #0054e3;
+                border-top: 3px solid #3c81f6;
+                box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.6);
+                width: 100%;
+                box-sizing: border-box;
+                animation: popIn 0.4s ease-out forwards;
+            }
+
+            .barre-titre {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: linear-gradient(to bottom, #0058e6 0%, #3a81f7 100%);
+                color: white;
+                padding: 6px 10px;
+                font-weight: bold;
+                text-shadow: 1px 1px #002288;
+            }
+
+            .bouton-fermer {
+                background-color: #e81123;
+                color: white;
+                border: 1px solid #750009;
+                width: 20px;
+                height: 20px;
+                font-weight: bold;
+                font-size: 12px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+            }
+
+            .bouton-fermer:hover {
+                background-color: #f1707a;
+            }
+
+            .Onglets {
+                display: flex;
+                background-color: #ece9d8;
+                padding: 5px 10px 0 10px;
+                gap: 5px;
+                border-bottom: 1px solid #999;
+            }
+
+            .Onglets button {
+                background-color: #ece9d8;
+                border: 1px solid #999;
+                border-bottom: none;
+                padding: 6px 12px;
+                font-family: 'Tahoma', sans-serif;
+                font-size: 12px;
+                cursor: pointer;
+                border-radius: 4px 4px 0 0;
+            }
+
+            .Onglets button.actif {
+                background-color: #f5f4ef;
+                font-weight: bold;
+                padding-bottom: 8px;
+            }
+
+            .Contenu-Principal {
+                display: flex; 
+                gap: 20px; 
+                padding: 20px;
+                background-color: #f5f4ef;
+            }
+
+            .Colonne-gauche {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                width: 40%;
+            }
+
+            .Colonne-gauche a {
+                background-color: #ffffff;
+                color: black;
+                text-decoration: none;
+                padding: 10px;
+                border: 1px solid #7f9db9;
+                border-radius: 3px;
+                font-size: 14px;
+                box-shadow: inset 1px 1px 0px #fff, 1px 1px 2px rgba(0,0,0,0.1);
+                transition: all 0.2s ease-in-out;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .Colonne-gauche a:hover {
+                background-color: #0054e3;
+                color: white;
+                border-color: #002288;
+                transform: translateX(5px);
+            }
+
+            .Colonne-gauche img {
+                width: 20px;
+                height: 20px;
+                object-fit: contain;
+            }
+
+            .Colonne-droite {
+                width: 60%;
+                background: white;
+                border: 1px inset #ccc;
+                padding: 15px;
+                box-sizing: border-box;
+            }
+
+            .Colonne-droite h3 {
+                margin-top: 0;
+                font-size: 15px;
+                border-bottom: 2px solid #0054e3;
+                padding-bottom: 5px;
+            }
+
+            .skill-container {
+                margin-bottom: 12px;
+            }
+
+            .skill-title {
+                font-size: 13px;
+                margin-bottom: 3px;
+                font-weight: bold;
+            }
+
+            .skill-bar {
+                background-color: #e0e0e0;
+                height: 10px;
+                border: 1px solid #999;
+                border-radius: 2px;
+                overflow: hidden;
+            }
+
+            .skill-level {
+                background: linear-gradient(to right, #0054e3, #3a81f7);
+                height: 100%;
+                width: 0%;
+                animation: fillBar 1s ease-out forwards;
+            }
+
+            @keyframes fillBar {
+                to { width: var(--target-width); }
+            }
+
+            @media (max-width: 600px) {
+                .Contenu-Principal {
+                    flex-direction: column;
+                }
+
+                .Colonne-gauche, .Colonne-droite {
+                    width: 100%;
+                }
+
+                body {
+                    overflow-y: auto;
+                    height: auto;
+                    padding: 20px 0;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <audio id="son-clic" src="assets/audio/click-sfx.mp3" preload="auto"></audio>
+
+        <div class="wrapper-3d" id="wrapper3D">
+            <div class="Fenetre-XP">
+
+                <div class="barre-titre">
+                    <span>📁 Portfolio.exe</span>
+                    <div class="bouton-fermer">×</div>
+                </div>
+                
+                <div class="Onglets">
+                    <button class="actif">about me</button>
+                    <button>More...Coming Soon</button>
+                </div>
+
+                <div class="Contenu-Principal">
+                    
+                    <div class="Colonne-gauche">
+                        <a href="https://www.youtube.com/@huggy_jumper" target="_blank">
+                            <img src="assets/images/logo-youtube.png" alt="YT"> Youtube
+                        </a>
+                        <a href="https://www.twitch.tv/huggyjumpur" target="_blank">
+                            <img src="assets/images/logo-twitch.png" alt="Twitch"> Twitch
+                        </a>
+                        <a href="https://discord.gg/uDRufkr4eX" target="_blank">
+                            <img src="assets/images/logo-discord.png" alt="Discord"> Discord
+                        </a>
+                        <a href="https://www.tiktok.com/@huggy_jumper" target="_blank">
+                            <img src="assets/images/logo-tiktok.png" alt="Tiktok"> Tiktok
+                        </a>
+                    </div>
+
+                    <div class="Colonne-droite">
+                        <h3>My Skills</h3>
+                        
+                        <div class="skill-container">
+                            <div class="skill-title">Graphics</div>
+                            <div class="skill-bar"><div class="skill-level" style="--target-width: 50%;"></div></div>
+                        </div>
+
+                        <div class="skill-container">
+                            <div class="skill-title">3D</div>
+                            <div class="skill-bar"><div class="skill-level" style="--target-width: 25%;"></div></div>
+                        </div>
+
+                        <div class="skill-container">
+                            <div class="skill-title">Html/css</div>
+                            <div class="skill-bar"><div class="skill-level" style="--target-width: 10%;"></div></div>
+                        </div>
+                    </div>
+
+                </div> 
+            </div> 
+        </div>
+
+        <script>
+            const sonClic = document.getElementById('son-clic');
+            sonClic.volume = 0.3;
+            
+            document.addEventListener('click', () => {
+                sonClic.currentTime = 0;
+                sonClic.play().catch(e => {});
+            });
+
+            const wrapper = document.getElementById('wrapper3D');
+
+            document.addEventListener('mousemove', (e) => {
+                if (window.innerWidth > 600) {
+                    const x = e.clientX;
+                    const y = e.clientY;
+
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+
+                    const rotateX = -((y - centerY) / centerY) * 12; 
+                    const rotateY = ((x - centerX) / centerX) * 12;
+
+                    wrapper.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                }
+            });
+        </script>
+    </body>
+</html>
