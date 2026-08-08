@@ -1,296 +1,842 @@
 <!DOCTYPE html>
-<html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>portfolio.exe</title>
-        
-        <style>
-            @keyframes popIn {
-                0% {
-                    opacity: 0;
-                    transform: scale(0.9) translateY(20px);
-                }
-                100% {
-                    opacity: 1;
-                    transform: scale(1) translateY(0);
-                }
-            }
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>portfolio.exe</title>
 
-            body {
-                background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('assets/images/fond-anime.gif');
-                background-size: cover;
-                background-position: center;
-                background-color: #0b0b0e;
+<style>
+    :root {
+        --xp-blue-dark: #0054e3;
+        --xp-blue-light: #3a81f7;
+        --xp-face: #ece9d8;
+        --xp-face-light: #f5f4ef;
+        --xp-green: #3fae3c;
+        --xp-green-light: #77e377;
+    }
 
-                min-height: 100vh;
-                margin: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-family: 'Tahoma', sans-serif;
-                overflow-x: hidden;
-                perspective: 1000px;
-            }
+    * { box-sizing: border-box; }
 
-            .wrapper-3d {
-                transform-style: preserve-3d;
-                transition: transform 0.1s ease-out;
-                width: 100%;
-                max-width: 650px;
-                padding: 15px;
-                box-sizing: border-box;
-            }
+    @keyframes popIn {
+        0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
 
-            .Fenetre-XP {
-                background-color: #ece9d8;
-                border: 3px solid #0054e3;
-                border-top: 3px solid #3c81f6;
-                box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.6);
-                width: 100%;
-                box-sizing: border-box;
-                animation: popIn 0.4s ease-out forwards;
-            }
+    @keyframes fillBar { to { width: var(--target-width); } }
 
-            .barre-titre {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: linear-gradient(to bottom, #0058e6 0%, #3a81f7 100%);
-                color: white;
-                padding: 6px 10px;
-                font-weight: bold;
-                text-shadow: 1px 1px #002288;
-            }
+    @keyframes blink { 50% { opacity: 0.35; } }
 
-            .bouton-fermer {
-                background-color: #e81123;
-                color: white;
-                border: 1px solid #750009;
-                width: 20px;
-                height: 20px;
-                font-weight: bold;
-                font-size: 12px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                cursor: pointer;
-            }
+    /* --- Curseur personnalisé façon XP (flèche blanche, contour noir) --- */
+    html, body {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 2 L4 20 L8.5 16 L11 22 L14 20.5 L11.5 14.5 L18 14.5 Z" fill="white" stroke="black" stroke-width="1.3" stroke-linejoin="round"/></svg>') 2 2, auto;
+        margin: 0;
+        height: 100vh;
+        overflow: hidden;
+        font-family: 'Tahoma', 'Segoe UI', sans-serif;
+    }
 
-            .bouton-fermer:hover {
-                background-color: #f1707a;
-            }
+    a, button, .icone-bureau, .barre-titre, .bouton-demarrer, .item-menu {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 2 L4 20 L8.5 16 L11 22 L14 20.5 L11.5 14.5 L18 14.5 Z" fill="white" stroke="black" stroke-width="1.3" stroke-linejoin="round"/></svg>') 2 2, pointer;
+    }
 
-            .Onglets {
-                display: flex;
-                background-color: #ece9d8;
-                padding: 5px 10px 0 10px;
-                gap: 5px;
-                border-bottom: 1px solid #999;
-            }
+    /* --- Scrollbar façon XP --- */
+    .scroll-xp::-webkit-scrollbar { width: 17px; height: 17px; }
+    .scroll-xp::-webkit-scrollbar-track { background: #d4d0c8; border-left: 1px solid #999; }
+    .scroll-xp::-webkit-scrollbar-thumb {
+        background: linear-gradient(to right, #e8e6df, #c6c3ba);
+        border: 1px solid #999;
+        border-radius: 2px;
+    }
+    .scroll-xp::-webkit-scrollbar-button {
+        background: var(--xp-face) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><polygon points="5,2 9,8 1,8" fill="black"/></svg>') no-repeat center;
+        background-size: 8px;
+        border: 1px solid #999;
+        height: 17px;
+    }
 
-            .Onglets button {
-                background-color: #ece9d8;
-                border: 1px solid #999;
-                border-bottom: none;
-                padding: 6px 12px;
-                font-family: 'Tahoma', sans-serif;
-                font-size: 12px;
-                cursor: pointer;
-                border-radius: 4px 4px 0 0;
-            }
+    /* ================= BOOT SCREEN ================= */
+    #ecran-demarrage {
+        position: fixed; inset: 0; background: #000;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        z-index: 9999; color: white; font-family: 'Tahoma', sans-serif;
+        transition: opacity 0.8s ease;
+    }
+    #ecran-demarrage .logo-boot {
+        display: flex; align-items: center; gap: 10px;
+        font-size: 22px; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 30px;
+        color: #ffffff;
+    }
+    #ecran-demarrage .logo-boot .drapeau {
+        display: flex; flex-wrap: wrap; width: 20px; height: 20px; gap: 2px;
+    }
+    #ecran-demarrage .logo-boot .drapeau span {
+        width: 9px; height: 9px;
+    }
+    #ecran-demarrage .logo-boot .drapeau span:nth-child(1) { background: #ff8a3d; }
+    #ecran-demarrage .logo-boot .drapeau span:nth-child(2) { background: #3dc7ff; }
+    #ecran-demarrage .logo-boot .drapeau span:nth-child(3) { background: #3dff6e; }
+    #ecran-demarrage .logo-boot .drapeau span:nth-child(4) { background: #ffd23d; }
+    .barre-chargement-boot {
+        width: 220px; height: 14px; border: 1px solid #4a4a4a; border-radius: 3px; overflow: hidden;
+        background: #111; padding: 2px;
+    }
+    .barre-chargement-boot-inner {
+        height: 100%; width: 40%; border-radius: 2px;
+        background: linear-gradient(to right, #1c53c9, #4d8ef7);
+        animation: courseBoot 1.1s ease-in-out infinite;
+    }
+    @keyframes courseBoot {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(350%); }
+    }
+    #ecran-demarrage .sous-texte { margin-top: 14px; font-size: 11px; color: #aaa; }
 
-            .Onglets button.actif {
-                background-color: #f5f4ef;
-                font-weight: bold;
-                padding-bottom: 8px;
-            }
+    /* ================= ECRAN ARRET ================= */
+    #ecran-arret {
+        position: fixed; inset: 0; background: #000; z-index: 10000;
+        display: none; align-items: center; justify-content: center;
+        color: #aab7d6; font-size: 15px; letter-spacing: .5px;
+    }
 
-            .Contenu-Principal {
-                display: flex; 
-                gap: 20px; 
-                padding: 20px;
-                background-color: #f5f4ef;
-            }
+    /* ================= BUREAU ================= */
+    #bureau {
+        position: fixed; inset: 0;
+        background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+                    linear-gradient(160deg, #2d6fd6 0%, #1a4faa 55%, #0f3a8c 100%);
+        overflow: hidden;
+    }
 
-            .Colonne-gauche {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                width: 40%;
-            }
+    .icones-bureau {
+        position: absolute; top: 16px; left: 16px;
+        display: flex; flex-direction: column; gap: 22px;
+    }
 
-            .Colonne-gauche a {
-                background-color: #ffffff;
-                color: black;
-                text-decoration: none;
-                padding: 10px;
-                border: 1px solid #7f9db9;
-                border-radius: 3px;
-                font-size: 14px;
-                box-shadow: inset 1px 1px 0px #fff, 1px 1px 2px rgba(0,0,0,0.1);
-                transition: all 0.2s ease-in-out;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
+    .icone-bureau {
+        width: 74px; display: flex; flex-direction: column; align-items: center;
+        gap: 4px; padding: 6px 2px; border: 1px solid transparent; border-radius: 3px;
+        user-select: none;
+    }
+    .icone-bureau:hover, .icone-bureau.selectionnee {
+        background: rgba(60, 110, 220, 0.35);
+        border: 1px dotted rgba(255,255,255,0.6);
+    }
+    .icone-bureau .glyphe {
+        font-size: 30px;
+        filter: drop-shadow(1px 2px 1px rgba(0,0,0,0.6));
+    }
+    .icone-bureau span {
+        color: white; font-size: 11px; text-align: center;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+        line-height: 1.2;
+    }
 
-            .Colonne-gauche a:hover {
-                background-color: #0054e3;
-                color: white;
-                border-color: #002288;
-                transform: translateX(5px);
-            }
+    /* ================= FENETRES ================= */
+    .fenetre-xp {
+        position: absolute;
+        background-color: var(--xp-face);
+        border: 3px solid var(--xp-blue-dark);
+        border-top: 3px solid var(--xp-blue-light);
+        box-shadow: 10px 10px 0px rgba(0,0,0,0.45);
+        display: flex; flex-direction: column;
+        animation: popIn 0.25s ease-out;
+        min-width: 280px;
+        min-height: 180px;
+    }
+    .fenetre-xp.active { box-shadow: 12px 12px 0px rgba(0,0,0,0.55); }
+    .fenetre-xp.masquee { display: none; }
+    .fenetre-xp.maximisee {
+        top: 0 !important; left: 0 !important;
+        width: 100% !important; height: calc(100% - 40px) !important;
+        border-width: 2px;
+    }
 
-            .Colonne-gauche img {
-                width: 20px;
-                height: 20px;
-                object-fit: contain;
-            }
+    .barre-titre {
+        display: flex; justify-content: space-between; align-items: center;
+        background: linear-gradient(to bottom, #0058e6 0%, #3a81f7 100%);
+        color: white; padding: 5px 6px 5px 8px; font-weight: bold;
+        font-size: 13px; text-shadow: 1px 1px #002288;
+        user-select: none;
+    }
+    .fenetre-xp:not(.active) .barre-titre {
+        background: linear-gradient(to bottom, #7a95c7 0%, #a9bce0 100%);
+    }
+    .titre-gauche { display: flex; align-items: center; gap: 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-            .Colonne-droite {
-                width: 60%;
-                background: white;
-                border: 1px inset #ccc;
-                padding: 15px;
-                box-sizing: border-box;
-            }
+    .boutons-fenetre { display: flex; gap: 3px; flex-shrink: 0; }
+    .btn-fenetre {
+        width: 21px; height: 19px; border: 1px solid #003399;
+        border-radius: 2px; display: flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: bold; color: #1b3a7a;
+        background: linear-gradient(to bottom, #ffffff, #d9e4f5);
+    }
+    .btn-fenetre:hover { filter: brightness(1.1); }
+    .btn-fenetre.fermer { background: linear-gradient(to bottom, #f97f89, #e81123); color: white; border-color: #750009; }
 
-            .Colonne-droite h3 {
-                margin-top: 0;
-                font-size: 15px;
-                border-bottom: 2px solid #0054e3;
-                padding-bottom: 5px;
-            }
+    .menu-fenetre {
+        display: flex; gap: 14px; background: var(--xp-face);
+        padding: 3px 10px; font-size: 12px; border-bottom: 1px solid #b7b19a;
+    }
 
-            .skill-container {
-                margin-bottom: 12px;
-            }
+    .onglets {
+        display: flex; background-color: var(--xp-face); padding: 5px 10px 0 10px;
+        gap: 5px; border-bottom: 1px solid #999;
+    }
+    .onglets button {
+        background-color: var(--xp-face); border: 1px solid #999; border-bottom: none;
+        padding: 5px 12px; font-family: 'Tahoma', sans-serif; font-size: 12px; border-radius: 4px 4px 0 0;
+    }
+    .onglets button.actif { background-color: var(--xp-face-light); font-weight: bold; padding-bottom: 7px; }
 
-            .skill-title {
-                font-size: 13px;
-                margin-bottom: 3px;
-                font-weight: bold;
-            }
+    .corps-fenetre {
+        flex: 1; overflow: auto; background: var(--xp-face-light);
+    }
 
-            .skill-bar {
-                background-color: #e0e0e0;
-                height: 10px;
-                border: 1px solid #999;
-                border-radius: 2px;
-                overflow: hidden;
-            }
+    .contenu-principal { display: flex; gap: 18px; padding: 18px; }
+    .colonne-gauche { display: flex; flex-direction: column; gap: 10px; width: 42%; }
+    .colonne-gauche a {
+        background-color: #ffffff; color: black; text-decoration: none; padding: 9px 10px;
+        border: 1px solid #7f9db9; border-radius: 3px; font-size: 13px;
+        box-shadow: inset 1px 1px 0px #fff, 1px 1px 2px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 10px; transition: all .15s ease;
+    }
+    .colonne-gauche a:hover { background-color: var(--xp-blue-dark); color: white; border-color: #002288; transform: translateX(4px); }
+    .logo-lien { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
+    .colonne-droite { width: 58%; background: white; border: 1px inset #ccc; padding: 14px; }
+    .colonne-droite h3 { margin-top: 0; font-size: 14px; border-bottom: 2px solid var(--xp-blue-dark); padding-bottom: 5px; }
 
-            .skill-level {
-                background: linear-gradient(to right, #0054e3, #3a81f7);
-                height: 100%;
-                width: 0%;
-                animation: fillBar 1s ease-out forwards;
-            }
+    .skill-container { margin-bottom: 12px; }
+    .skill-title { font-size: 12px; margin-bottom: 3px; font-weight: bold; display: flex; justify-content: space-between; }
+    .skill-bar { background-color: #e0e0e0; height: 12px; border: 1px solid #999; border-radius: 2px; overflow: hidden; padding: 1px; }
+    .skill-level {
+        height: 100%; width: 0%; border-radius: 1px; animation: fillBar 1s ease-out forwards;
+        background-image: repeating-linear-gradient(to right, var(--xp-green) 0px, var(--xp-green-light) 3px, var(--xp-green) 6px);
+        box-shadow: inset 0 2px 2px rgba(255,255,255,0.35), inset 0 -2px 2px rgba(0,0,0,0.15);
+    }
 
-            @keyframes fillBar {
-                to { width: var(--target-width); }
-            }
+    .contenu-liens { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .contenu-liens a {
+        background-color: #ffffff; color: black; text-decoration: none; padding: 10px;
+        border: 1px solid #7f9db9; border-radius: 3px; font-size: 14px;
+        display: flex; align-items: center; gap: 10px; transition: all .15s ease;
+    }
+    .contenu-liens a:hover { background-color: var(--xp-blue-dark); color: white; transform: translateX(5px); }
 
-            @media (max-width: 600px) {
-                .Contenu-Principal {
-                    flex-direction: column;
-                }
+    .poignee-redim {
+        position: absolute; right: 0; bottom: 0; width: 16px; height: 16px;
+        background: repeating-linear-gradient(135deg, transparent 0 2px, #7f9db9 2px 3px);
+    }
 
-                .Colonne-gauche, .Colonne-droite {
-                    width: 100%;
-                }
+    /* "My Computer" window */
+    .liste-lecteurs { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .lecteur { display: flex; align-items: center; gap: 10px; background: white; border: 1px solid #a9c1e0; padding: 8px; border-radius: 3px; }
+    .lecteur .glyphe { font-size: 22px; }
+    .lecteur .barre-espace { flex: 1; height: 8px; background: #ddd; border: 1px solid #999; border-radius: 2px; overflow: hidden; margin-top: 4px; }
+    .lecteur .barre-espace-inner { height: 100%; background: var(--xp-blue-light); }
 
-                body {
-                    overflow-y: auto;
-                    height: auto;
-                    padding: 20px 0;
-                }
-            }
-        </style>
-    </head>
+    .corbeille-vide { padding: 30px; text-align: center; color: #666; font-size: 13px; }
 
-    <body>
-        <audio id="son-clic" src="assets/audio/click-sfx.mp3" preload="auto"></audio>
+    /* "My Creations" window */
+    .filtres-creations {
+        display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px 0 16px;
+    }
+    .filtre-creation {
+        background: var(--xp-face); border: 1px solid #7f9db9; border-radius: 3px;
+        padding: 4px 10px; font-size: 11px; font-family: 'Tahoma', sans-serif;
+    }
+    .filtre-creation:hover { background: #dbe8ff; }
+    .filtre-creation.actif { background: var(--xp-blue-dark); color: white; border-color: #002288; }
+    .grille-creations {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px; padding: 16px;
+    }
+    .vignette-creation {
+        background: white; border: 1px solid #7f9db9; border-radius: 3px; overflow: hidden;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.15); display: flex; flex-direction: column;
+    }
+    .vignette-creation .image-vignette {
+        width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;
+        background: linear-gradient(135deg, #dce7fb, #b9cdf2);
+    }
+    .vignette-creation .legende {
+        padding: 6px 8px; font-size: 11px; text-align: center; border-top: 1px solid #d8d8d8;
+    }
+    .vignette-creation:hover { outline: 2px solid var(--xp-blue-dark); }
 
-        <div class="wrapper-3d" id="wrapper3D">
-            <div class="Fenetre-XP">
+    #visionneuse {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 6000;
+        display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px;
+    }
+    #visionneuse img { max-width: 85vw; max-height: 75vh; border: 4px solid var(--xp-face); box-shadow: 6px 6px 0 rgba(0,0,0,0.5); }
+    #visionneuse .legende-visionneuse { color: white; font-size: 13px; }
+    #visionneuse .fermer-visionneuse {
+        position: absolute; top: 20px; right: 24px; width: 30px; height: 28px;
+        background: linear-gradient(to bottom, #f97f89, #e81123); color: white; border: 1px solid #750009;
+        border-radius: 2px; display: flex; align-items: center; justify-content: center; font-weight: bold;
+    }
 
-                <div class="barre-titre">
-                    <span>📁 Portfolio.exe</span>
-                    <div class="bouton-fermer">×</div>
-                </div>
-                
-                <div class="Onglets">
-                    <button class="actif">about me</button>
-                    <button>More...Coming Soon</button>
-                </div>
+    /* proprietes desktop */
+    .contenu-proprietes { padding: 16px; font-size: 12px; line-height: 1.7; }
 
-                <div class="Contenu-Principal">
-                    
-                    <div class="Colonne-gauche">
-                        <a href="https://www.youtube.com/@huggy_jumper" target="_blank">
-                            <img src="assets/images/logo-youtube.png" alt="YT"> Youtube
-                        </a>
-                        <a href="https://www.twitch.tv/huggyjumpur" target="_blank">
-                            <img src="assets/images/logo-twitch.png" alt="Twitch"> Twitch
-                        </a>
-                        <a href="https://discord.gg/uDRufkr4eX" target="_blank">
-                            <img src="assets/images/logo-discord.png" alt="Discord"> Discord
-                        </a>
-                        <a href="https://www.tiktok.com/@huggy_jumper" target="_blank">
-                            <img src="assets/images/logo-tiktok.png" alt="Tiktok"> Tiktok
-                        </a>
-                    </div>
+    /* ================= MENU CONTEXTUEL ================= */
+    .menu-contextuel {
+        position: fixed; display: none; z-index: 5000;
+        background: var(--xp-face); border: 1px solid #6b6b6b; box-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+        min-width: 190px; padding: 3px; font-size: 12px;
+    }
+    .menu-contextuel .item-ctx {
+        padding: 6px 10px 6px 26px; position: relative;
+    }
+    .menu-contextuel .item-ctx:hover { background: var(--xp-blue-dark); color: white; }
+    .menu-contextuel hr { border: none; border-top: 1px solid #c8c4b8; margin: 3px 4px; }
 
-                    <div class="Colonne-droite">
-                        <h3>My Skills</h3>
-                        
-                        <div class="skill-container">
-                            <div class="skill-title">Graphics</div>
-                            <div class="skill-bar"><div class="skill-level" style="--target-width: 50%;"></div></div>
-                        </div>
+    /* ================= BARRE DES TACHES ================= */
+    #barre-taches {
+        position: fixed; left: 0; right: 0; bottom: 0; height: 40px;
+        background: linear-gradient(to bottom, #2a86ff 0%, #1c5fd6 4%, #1450c4 50%, #1c5fd6 96%, #0b3a99 100%);
+        display: flex; align-items: center; z-index: 4000;
+        box-shadow: 0 -1px 4px rgba(0,0,0,0.5);
+        border-top: 1px solid #6fa9ff;
+    }
 
-                        <div class="skill-container">
-                            <div class="skill-title">3D</div>
-                            <div class="skill-bar"><div class="skill-level" style="--target-width: 25%;"></div></div>
-                        </div>
+    .bouton-demarrer {
+        height: 30px; margin: 4px 6px; padding: 0 14px 0 10px;
+        background: linear-gradient(to bottom, #4fdc55 0%, #2fa838 45%, #1f8a28 55%, #3fd047 100%);
+        border-radius: 5px; border: 1px solid #14591b;
+        color: white; font-weight: bold; font-style: italic; font-size: 14px;
+        display: flex; align-items: center; gap: 6px; text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+    }
+    .bouton-demarrer:hover { filter: brightness(1.08); }
+    .bouton-demarrer .glyphe { font-size: 16px; }
 
-                        <div class="skill-container">
-                            <div class="skill-title">Html/css</div>
-                            <div class="skill-bar"><div class="skill-level" style="--target-width: 10%;"></div></div>
-                        </div>
-                    </div>
+    .separateur-taches { width: 2px; align-self: stretch; margin: 6px 4px; background: rgba(0,0,0,0.25); border-right: 1px solid rgba(255,255,255,0.2); }
 
-                </div> 
-            </div> 
+    #boutons-taches { flex: 1; display: flex; gap: 4px; overflow: hidden; height: 30px; align-items: center; }
+    .bouton-tache {
+        height: 28px; max-width: 160px; padding: 0 10px;
+        background: linear-gradient(to bottom, #3f7fe0, #1c56c0);
+        border: 1px solid #0d3a91; border-radius: 3px; color: white; font-size: 12px;
+        display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .bouton-tache.actif-tache {
+        background: linear-gradient(to bottom, #123c8e, #0a2c70);
+        box-shadow: inset 1px 1px 3px rgba(0,0,0,0.6);
+    }
+
+    #horloge-systeme {
+        color: white; font-size: 12px; padding: 0 14px;
+        border-left: 1px solid rgba(255,255,255,0.3);
+        height: 30px; display: flex; align-items: center; margin: 4px 4px 4px 0;
+        background: linear-gradient(to bottom, #1450c4, #0c3690);
+        border-radius: 3px 0 0 3px;
+    }
+
+    /* ================= MENU DEMARRER ================= */
+    #menu-demarrer {
+        position: fixed; left: 6px; bottom: 40px; width: 280px;
+        background: var(--xp-face-light); border: 2px solid #0054e3; border-radius: 8px 8px 0 0;
+        box-shadow: 4px 4px 10px rgba(0,0,0,0.5); overflow: hidden;
+        display: none; flex-direction: column; z-index: 4500;
+        animation: popIn 0.15s ease-out;
+    }
+    #entete-menu-demarrer {
+        background: linear-gradient(to bottom, #1c5fd6, #0b3a99);
+        color: white; padding: 10px 12px; display: flex; align-items: center; gap: 10px;
+        font-weight: bold; font-size: 14px;
+    }
+    #entete-menu-demarrer .avatar { font-size: 26px; background: rgba(255,255,255,0.15); border-radius: 4px; padding: 4px 8px; }
+    .liste-menu-demarrer { padding: 8px; display: flex; flex-direction: column; gap: 2px; }
+    .item-menu {
+        display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 3px; font-size: 13px;
+    }
+    .item-menu:hover { background: var(--xp-blue-dark); color: white; }
+    .item-menu .glyphe { font-size: 18px; width: 22px; text-align: center; }
+    .pied-menu-demarrer {
+        border-top: 1px solid #b7b19a; padding: 6px 8px; background: var(--xp-face);
+    }
+    .pied-menu-demarrer .item-menu.arret:hover { background: #c0392b; }
+
+    @media (max-width: 620px) {
+        .contenu-principal { flex-direction: column; }
+        .colonne-gauche, .colonne-droite { width: 100%; }
+        .fenetre-xp { left: 10px !important; right: 10px; width: calc(100% - 20px) !important; }
+    }
+</style>
+</head>
+<body>
+
+<audio id="son-clic" preload="auto"><source src="assets/audio/click-sfx.mp3"></audio>
+
+<!-- ECRAN DE DEMARRAGE -->
+<div id="ecran-demarrage">
+    <div class="logo-boot">
+        <div class="drapeau"><span></span><span></span><span></span><span></span></div>
+        huggy_jumper
+    </div>
+    <div class="barre-chargement-boot"><div class="barre-chargement-boot-inner"></div></div>
+    <div class="sous-texte">Starting Windows...</div>
+</div>
+
+<!-- SHUTDOWN SCREEN -->
+<div id="ecran-arret">Signing out...</div>
+
+<!-- DESKTOP -->
+<div id="bureau">
+    <div class="icones-bureau">
+        <div class="icone-bureau" data-fenetre="fenetre-principale" tabindex="0">
+            <div class="glyphe">📁</div><span>Portfolio.exe</span>
         </div>
+        <div class="icone-bureau" data-fenetre="fenetre-liens" tabindex="0">
+            <div class="glyphe">🌐</div><span>My Links</span>
+        </div>
+        <div class="icone-bureau" data-fenetre="fenetre-creations" tabindex="0">
+            <div class="glyphe">🖼️</div><span>My Creations</span>
+        </div>
+        <div class="icone-bureau" data-fenetre="fenetre-poste" tabindex="0">
+            <div class="glyphe">💻</div><span>My Computer</span>
+        </div>
+        <div class="icone-bureau" data-fenetre="fenetre-corbeille" tabindex="0">
+            <div class="glyphe">🗑️</div><span>Recycle Bin</span>
+        </div>
+    </div>
+</div>
 
-        <script>
-            const sonClic = document.getElementById('son-clic');
-            sonClic.volume = 0.3;
-            
-            document.addEventListener('click', () => {
-                sonClic.currentTime = 0;
-                sonClic.play().catch(e => {});
-            });
+<!-- DESKTOP CONTEXT MENU -->
+<div class="menu-contextuel" id="menu-contextuel">
+    <div class="item-ctx" id="ctx-actualiser">🔄 Refresh</div>
+    <div class="item-ctx" id="ctx-arranger">🧭 Arrange Icons</div>
+    <hr>
+    <div class="item-ctx" id="ctx-nouveau">🗂️ New Folder</div>
+    <hr>
+    <div class="item-ctx" id="ctx-proprietes">⚙️ Properties</div>
+</div>
 
-            const wrapper = document.getElementById('wrapper3D');
+<!-- VISIONNEUSE D'IMAGE -->
+<div id="visionneuse">
+    <div class="fermer-visionneuse" id="fermer-visionneuse">×</div>
+    <img id="image-visionneuse" src="" alt="">
+    <div class="legende-visionneuse" id="legende-visionneuse"></div>
+</div>
 
-            document.addEventListener('mousemove', (e) => {
-                if (window.innerWidth > 600) {
-                    const x = e.clientX;
-                    const y = e.clientY;
+<!-- TASKBAR -->
+<div id="barre-taches">
+    <div class="bouton-demarrer" id="bouton-demarrer"><span class="glyphe">🪟</span>start</div>
+    <div class="separateur-taches"></div>
+    <div id="boutons-taches"></div>
+    <div id="horloge-systeme">--:--</div>
+</div>
 
-                    const centerX = window.innerWidth / 2;
-                    const centerY = window.innerHeight / 2;
+<!-- START MENU -->
+<div id="menu-demarrer">
+    <div id="entete-menu-demarrer"><span class="avatar">🙂</span>huggy_jumper</div>
+    <div class="liste-menu-demarrer">
+        <div class="item-menu" data-fenetre="fenetre-principale"><span class="glyphe">📁</span>Portfolio.exe</div>
+        <div class="item-menu" data-fenetre="fenetre-liens"><span class="glyphe">🌐</span>My Links</div>
+        <div class="item-menu" data-fenetre="fenetre-creations"><span class="glyphe">🖼️</span>My Creations</div>
+        <div class="item-menu" data-fenetre="fenetre-poste"><span class="glyphe">💻</span>My Computer</div>
+        <div class="item-menu" data-fenetre="fenetre-corbeille"><span class="glyphe">🗑️</span>Recycle Bin</div>
+    </div>
+    <div class="pied-menu-demarrer">
+        <div class="item-menu arret" id="item-arret"><span class="glyphe">🔴</span>Shut Down...</div>
+    </div>
+</div>
 
-                    const rotateX = -((y - centerY) / centerY) * 12; 
-                    const rotateY = ((x - centerX) / centerX) * 12;
+<!-- TEMPLATE DES FENETRES (générées en JS à partir de ces blocs cachés) -->
+<template id="tpl-fenetre-principale">
+    <div class="menu-fenetre"><span>File</span><span>Edit</span><span>View</span><span>?</span></div>
+    <div class="onglets">
+        <button class="actif">about me</button>
+        <button>More...Coming Soon</button>
+    </div>
+    <div class="contenu-principal">
+        <div class="colonne-gauche">
+            <a href="https://www.youtube.com/@huggy_jumper" target="_blank"><img class="logo-lien" src="assets/images/logo-youtube.png" alt="YT">Youtube</a>
+            <a href="https://www.twitch.tv/huggyjumpur" target="_blank"><img class="logo-lien" src="assets/images/logo-twitch.png" alt="Twitch">Twitch</a>
+            <a href="https://discord.gg/uDRufkr4eX" target="_blank"><img class="logo-lien" src="assets/images/logo-discord.png" alt="Discord">Discord</a>
+            <a href="https://www.tiktok.com/@huggy_jumper" target="_blank"><img class="logo-lien" src="assets/images/logo-tiktok.png" alt="Tiktok">Tiktok</a>
+        </div>
+        <div class="colonne-droite">
+            <h3>My Skills</h3>
+            <div class="skill-container">
+                <div class="skill-title"><span>Graphics</span><span>50%</span></div>
+                <div class="skill-bar"><div class="skill-level" style="--target-width: 50%;"></div></div>
+            </div>
+            <div class="skill-container">
+                <div class="skill-title"><span>3D</span><span>25%</span></div>
+                <div class="skill-bar"><div class="skill-level" style="--target-width: 25%;"></div></div>
+            </div>
+            <div class="skill-container">
+                <div class="skill-title"><span>Html/css</span><span>10%</span></div>
+                <div class="skill-bar"><div class="skill-level" style="--target-width: 10%;"></div></div>
+            </div>
+        </div>
+    </div>
+</template>
 
-                    wrapper.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-                }
-            });
-        </script>
-    </body>
+<template id="tpl-fenetre-liens">
+    <div class="contenu-liens">
+        <a href="https://www.youtube.com/@huggy_jumper" target="_blank"><img class="logo-lien" src="assets/images/logo-youtube.png" alt="YT">Youtube</a>
+        <a href="https://www.twitch.tv/huggyjumpur" target="_blank"><img class="logo-lien" src="assets/images/logo-twitch.png" alt="Twitch">Twitch</a>
+        <a href="https://discord.gg/uDRufkr4eX" target="_blank"><img class="logo-lien" src="assets/images/logo-discord.png" alt="Discord">Discord</a>
+        <a href="https://www.tiktok.com/@huggy_jumper" target="_blank"><img class="logo-lien" src="assets/images/logo-tiktok.png" alt="Tiktok">Tiktok</a>
+    </div>
+</template>
+
+<template id="tpl-fenetre-creations">
+    <div class="filtres-creations">
+        <button class="filtre-creation actif" data-categorie="all">All</button>
+        <button class="filtre-creation" data-categorie="thumbnail">Thumbnails</button>
+        <button class="filtre-creation" data-categorie="youtube-banner">YouTube Banners</button>
+        <button class="filtre-creation" data-categorie="discord-banner">Discord Banners</button>
+        <button class="filtre-creation" data-categorie="pfp">Profile Pictures</button>
+    </div>
+    <div class="grille-creations">
+        <div class="vignette-creation" data-categorie="thumbnail" data-titre="Thumbnail Not Official Byilhan">
+            <img class="image-vignette" src="assets/images/creations/thumbnail-1.jpg" alt="Thumbnail 1" onerror="this.style.opacity=0">
+            <div class="legende">Thumbnail Not Official Byilhan</div>
+        </div>
+        <div class="vignette-creation" data-categorie="youtube-banner" data-titre="YouTube Banner 1">
+            <img class="image-vignette" src="assets/images/creations/youtube-banner-1.jpg" alt="YouTube Banner 1" onerror="this.style.opacity=0">
+            <div class="legende">YouTube Banner 1</div>
+        </div>
+        <div class="vignette-creation" data-categorie="discord-banner" data-titre="Discord Banner Fap Marin Kitagawa">
+            <img class="image-vignette" src="assets/images/creations/discord-banner-1.jpg" alt="Discord Banner 1" onerror="this.style.opacity=0">
+            <div class="legende">Discord Banner Fap Marin Kitagawa</div>
+        </div>
+        <div class="vignette-creation" data-categorie="pfp" data-titre="Profile Picture Kirito">
+            <img class="image-vignette" src="assets/images/creations/pfp-1.jpg" alt="Profile Picture 1" onerror="this.style.opacity=0">
+            <div class="legende">Profile Picture Kirito</div>
+        </div>
+        <div class="vignette-creation" data-categorie="pfp" data-titre="Profile Picture Marin Kitagwa">
+            <img class="image-vignette" src="assets/images/creations/pfp-2.jpg" alt="Profile Picture 1" onerror="this.style.opacity=0">
+            <div class="legende">Profile Picture Marin Kitagawa</div>
+        </div>
+        <div class="vignette-creation" data-categorie="pfp" data-titre="Profile Picture Alya">
+            <img class="image-vignette" src="assets/images/creations/pfp-3.jpg" alt="Profile Picture 1" onerror="this.style.opacity=0">
+            <div class="legende">Profile Picture Alya</div>
+        </div>
+    </div>
+</template>
+
+<template id="tpl-fenetre-poste">
+    <div class="liste-lecteurs">
+        <div class="lecteur">
+            <div class="glyphe">💽</div>
+            <div style="flex:1">
+                <div>Local Disk (C:)</div>
+                <div class="barre-espace"><div class="barre-espace-inner" style="width:72%"></div></div>
+            </div>
+        </div>
+        <div class="lecteur">
+            <div class="glyphe">📀</div>
+            <div style="flex:1">
+                <div>Projects (D:)</div>
+                <div class="barre-espace"><div class="barre-espace-inner" style="width:30%"></div></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="tpl-fenetre-corbeille">
+    <div class="corbeille-vide">🗑️<br><br>The Recycle Bin is empty.</div>
+</template>
+
+<template id="tpl-fenetre-proprietes">
+    <div class="contenu-proprietes">
+        <b>Display</b> — theme: Windows XP (Luna)<br>
+        <b>Resolution</b> — adaptive<br>
+        <b>Background</b> — blue gradient<br>
+        <b>Owner</b> — huggy_jumper
+    </div>
+</template>
+
+<script>
+(function () {
+    const sonClic = document.getElementById('son-clic');
+    function jouerSon() {
+        try { sonClic.currentTime = 0; sonClic.volume = 0.3; sonClic.play().catch(() => {}); } catch (e) {}
+    }
+    document.addEventListener('click', jouerSon);
+
+    /* ---------- ECRAN DE DEMARRAGE ---------- */
+    const ecranDemarrage = document.getElementById('ecran-demarrage');
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            ecranDemarrage.style.opacity = '0';
+            setTimeout(() => { ecranDemarrage.style.display = 'none'; ouvrirFenetre('fenetre-principale'); }, 800);
+        }, 1600);
+    });
+
+    /* ---------- HORLOGE ---------- */
+    const horloge = document.getElementById('horloge-systeme');
+    function majHorloge() {
+        const d = new Date();
+        const h = String(d.getHours()).padStart(2, '0');
+        const m = String(d.getMinutes()).padStart(2, '0');
+        horloge.textContent = `${h}:${m}`;
+    }
+    majHorloge();
+    setInterval(majHorloge, 10000);
+
+    /* ---------- GESTION DES FENETRES ---------- */
+    const config = {
+        'fenetre-principale': { titre: 'Portfolio.exe', icone: '📁', largeur: 620, hauteur: 400 },
+        'fenetre-liens':      { titre: 'My Links',      icone: '🌐', largeur: 340, hauteur: 320 },
+        'fenetre-creations':  { titre: 'My Creations',  icone: '🖼️', largeur: 480, hauteur: 400 },
+        'fenetre-poste':      { titre: 'My Computer',   icone: '💻', largeur: 400, hauteur: 260 },
+        'fenetre-corbeille':  { titre: 'Recycle Bin',   icone: '🗑️', largeur: 340, hauteur: 220 },
+        'fenetre-proprietes': { titre: 'Display Properties', icone: '⚙️', largeur: 360, hauteur: 220 }
+    };
+
+    let zIndexCourant = 100;
+    const fenetresOuvertes = {}; // id -> { el, boutonTache, minimisee }
+    let decalageOuverture = 0;
+
+    function ouvrirFenetre(id) {
+        if (fenetresOuvertes[id]) {
+            const f = fenetresOuvertes[id];
+            f.el.classList.remove('masquee');
+            f.minimisee = false;
+            mettreAuPremierPlan(id);
+            return;
+        }
+        const cfg = config[id];
+        const tpl = document.getElementById('tpl-' + id);
+        const el = document.createElement('div');
+        el.className = 'fenetre-xp';
+        el.id = id;
+
+        const bureauRect = document.getElementById('bureau').getBoundingClientRect();
+        const marge = 60;
+        let left = Math.min(bureauRect.width - cfg.largeur - 30, 90 + decalageOuverture);
+        let top = Math.min(bureauRect.height - cfg.hauteur - 60, 60 + decalageOuverture);
+        decalageOuverture = (decalageOuverture + 28) % 160;
+
+        el.style.left = Math.max(10, left) + 'px';
+        el.style.top = Math.max(10, top) + 'px';
+        el.style.width = cfg.largeur + 'px';
+        el.style.height = cfg.hauteur + 'px';
+
+        el.innerHTML = `
+            <div class="barre-titre" data-drag="${id}">
+                <div class="titre-gauche"><span>${cfg.icone}</span><span>${cfg.titre}</span></div>
+                <div class="boutons-fenetre">
+                    <div class="btn-fenetre reduire" title="Réduire">_</div>
+                    <div class="btn-fenetre agrandir" title="Agrandir">□</div>
+                    <div class="btn-fenetre fermer" title="Fermer">×</div>
+                </div>
+            </div>
+            <div class="corps-fenetre scroll-xp"></div>
+            <div class="poignee-redim"></div>
+        `;
+        el.querySelector('.corps-fenetre').appendChild(tpl.content.cloneNode(true));
+        document.getElementById('bureau').appendChild(el);
+
+        rendreDeplacable(el, el.querySelector('.barre-titre'));
+        rendreRedimensionnable(el, el.querySelector('.poignee-redim'));
+
+        el.querySelector('.fermer').addEventListener('click', (e) => { e.stopPropagation(); fermerFenetre(id); });
+        el.querySelector('.reduire').addEventListener('click', (e) => { e.stopPropagation(); reduireFenetre(id); });
+        el.querySelector('.agrandir').addEventListener('click', (e) => { e.stopPropagation(); basculerAgrandir(id); });
+        el.addEventListener('mousedown', () => mettreAuPremierPlan(id));
+
+        const boutonTache = document.createElement('div');
+        boutonTache.className = 'bouton-tache';
+        boutonTache.innerHTML = `<span>${cfg.icone}</span><span>${cfg.titre}</span>`;
+        boutonTache.addEventListener('click', () => {
+            const f = fenetresOuvertes[id];
+            if (f.minimisee) { f.el.classList.remove('masquee'); f.minimisee = false; mettreAuPremierPlan(id); }
+            else if (id === fenetreActive) { reduireFenetre(id); }
+            else { mettreAuPremierPlan(id); }
+        });
+        document.getElementById('boutons-taches').appendChild(boutonTache);
+
+        fenetresOuvertes[id] = { el, boutonTache, minimisee: false };
+        mettreAuPremierPlan(id);
+    }
+
+    let fenetreActive = null;
+    function mettreAuPremierPlan(id) {
+        Object.entries(fenetresOuvertes).forEach(([fid, f]) => {
+            f.el.classList.remove('active');
+            f.boutonTache.classList.remove('actif-tache');
+        });
+        const f = fenetresOuvertes[id];
+        if (!f) return;
+        zIndexCourant += 1;
+        f.el.style.zIndex = zIndexCourant;
+        f.el.classList.add('active');
+        f.boutonTache.classList.add('actif-tache');
+        fenetreActive = id;
+    }
+
+    function fermerFenetre(id) {
+        const f = fenetresOuvertes[id];
+        if (!f) return;
+        f.el.remove();
+        f.boutonTache.remove();
+        delete fenetresOuvertes[id];
+        if (fenetreActive === id) fenetreActive = null;
+    }
+
+    function reduireFenetre(id) {
+        const f = fenetresOuvertes[id];
+        if (!f) return;
+        f.el.classList.add('masquee');
+        f.minimisee = true;
+        f.boutonTache.classList.remove('actif-tache');
+    }
+
+    function basculerAgrandir(id) {
+        const f = fenetresOuvertes[id];
+        if (!f) return;
+        f.el.classList.toggle('maximisee');
+        mettreAuPremierPlan(id);
+    }
+
+    function rendreDeplacable(el, poignee) {
+        let dx = 0, dy = 0, enCours = false;
+        poignee.addEventListener('mousedown', (e) => {
+            if (el.classList.contains('maximisee')) return;
+            if (e.target.closest('.btn-fenetre')) return;
+            enCours = true;
+            dx = e.clientX - el.offsetLeft;
+            dy = e.clientY - el.offsetTop;
+            mettreAuPremierPlan(el.id);
+        });
+        poignee.addEventListener('touchstart', (e) => {
+            if (el.classList.contains('maximisee')) return;
+            const t = e.touches[0];
+            enCours = true;
+            dx = t.clientX - el.offsetLeft;
+            dy = t.clientY - el.offsetTop;
+            mettreAuPremierPlan(el.id);
+        }, { passive: true });
+        document.addEventListener('mousemove', (e) => {
+            if (!enCours) return;
+            el.style.left = Math.max(0, e.clientX - dx) + 'px';
+            el.style.top = Math.max(0, e.clientY - dy) + 'px';
+        });
+        document.addEventListener('touchmove', (e) => {
+            if (!enCours) return;
+            const t = e.touches[0];
+            el.style.left = Math.max(0, t.clientX - dx) + 'px';
+            el.style.top = Math.max(0, t.clientY - dy) + 'px';
+        }, { passive: true });
+        document.addEventListener('mouseup', () => enCours = false);
+        document.addEventListener('touchend', () => enCours = false);
+        poignee.addEventListener('dblclick', () => basculerAgrandir(el.id));
+    }
+
+    function rendreRedimensionnable(el, poignee) {
+        let enCours = false, startX, startY, startW, startH;
+        poignee.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+            enCours = true;
+            startX = e.clientX; startY = e.clientY;
+            startW = el.offsetWidth; startH = el.offsetHeight;
+            mettreAuPremierPlan(el.id);
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!enCours) return;
+            el.style.width = Math.max(280, startW + (e.clientX - startX)) + 'px';
+            el.style.height = Math.max(160, startH + (e.clientY - startY)) + 'px';
+        });
+        document.addEventListener('mouseup', () => enCours = false);
+    }
+
+    /* ---------- ICONES BUREAU ---------- */
+    document.querySelectorAll('.icone-bureau').forEach(ic => {
+        let dernierClic = 0;
+        ic.addEventListener('click', () => {
+            document.querySelectorAll('.icone-bureau').forEach(i => i.classList.remove('selectionnee'));
+            ic.classList.add('selectionnee');
+            const maintenant = Date.now();
+            if (maintenant - dernierClic < 400) ouvrirFenetre(ic.dataset.fenetre);
+            dernierClic = maintenant;
+        });
+        ic.addEventListener('keydown', (e) => { if (e.key === 'Enter') ouvrirFenetre(ic.dataset.fenetre); });
+    });
+
+    /* ---------- MENU DEMARRER ---------- */
+    const menuDemarrer = document.getElementById('menu-demarrer');
+    const boutonDemarrer = document.getElementById('bouton-demarrer');
+    boutonDemarrer.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuDemarrer.style.display = menuDemarrer.style.display === 'flex' ? 'none' : 'flex';
+    });
+    document.querySelectorAll('#menu-demarrer .item-menu[data-fenetre]').forEach(item => {
+        item.addEventListener('click', () => {
+            ouvrirFenetre(item.dataset.fenetre);
+            menuDemarrer.style.display = 'none';
+        });
+    });
+    document.addEventListener('click', (e) => {
+        if (!menuDemarrer.contains(e.target) && e.target !== boutonDemarrer) {
+            menuDemarrer.style.display = 'none';
+        }
+    });
+
+    /* ---------- ARRET ---------- */
+    document.getElementById('item-arret').addEventListener('click', () => {
+        document.getElementById('ecran-arret').style.display = 'flex';
+        setTimeout(() => {
+            document.getElementById('ecran-arret').style.display = 'none';
+            menuDemarrer.style.display = 'none';
+        }, 2200);
+    });
+
+    /* ---------- MENU CONTEXTUEL ---------- */
+    const menuCtx = document.getElementById('menu-contextuel');
+    document.getElementById('bureau').addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        menuCtx.style.left = e.clientX + 'px';
+        menuCtx.style.top = e.clientY + 'px';
+        menuCtx.style.display = 'block';
+    });
+    document.addEventListener('click', () => menuCtx.style.display = 'none');
+    document.getElementById('ctx-actualiser').addEventListener('click', () => location.reload());
+    document.getElementById('ctx-arranger').addEventListener('click', () => {
+        document.querySelector('.icones-bureau').style.transition = 'transform .2s';
+    });
+    document.getElementById('ctx-proprietes').addEventListener('click', () => ouvrirFenetre('fenetre-proprietes'));
+
+    /* ---------- VISIONNEUSE (galerie créations) ---------- */
+    const visionneuse = document.getElementById('visionneuse');
+    const imageVisionneuse = document.getElementById('image-visionneuse');
+    const legendeVisionneuse = document.getElementById('legende-visionneuse');
+
+    document.getElementById('bureau').addEventListener('click', (e) => {
+        const vignette = e.target.closest('.vignette-creation');
+        if (!vignette) return;
+        const img = vignette.querySelector('img');
+        imageVisionneuse.src = img.src;
+        legendeVisionneuse.textContent = vignette.dataset.titre || '';
+        visionneuse.style.display = 'flex';
+    });
+    document.getElementById('fermer-visionneuse').addEventListener('click', (e) => {
+        e.stopPropagation();
+        visionneuse.style.display = 'none';
+    });
+    visionneuse.addEventListener('click', (e) => {
+        if (e.target === visionneuse) visionneuse.style.display = 'none';
+    });
+
+    /* ---------- FILTRES GALERIE (My Creations) ---------- */
+    document.getElementById('bureau').addEventListener('click', (e) => {
+        const filtre = e.target.closest('.filtre-creation');
+        if (!filtre) return;
+        const conteneur = filtre.closest('.corps-fenetre');
+        conteneur.querySelectorAll('.filtre-creation').forEach(b => b.classList.remove('actif'));
+        filtre.classList.add('actif');
+        const categorie = filtre.dataset.categorie;
+        conteneur.querySelectorAll('.vignette-creation').forEach(v => {
+            v.style.display = (categorie === 'all' || v.dataset.categorie === categorie) ? '' : 'none';
+        });
+    });
+
+})();
+</script>
+</body>
 </html>
