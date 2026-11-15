@@ -1,850 +1,582 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>portfolio.exe</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tsuketsu ZRG — Designer Graphique & Artiste 3D/VFX</title>
+<meta name="description" content="Portfolio de Tsuketsu ZRG : miniatures YouTube, logos, bannières, 3D et VFX.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Tailwind CSS (nécessite une connexion internet) -->
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <style>
-    :root {
-        --xp-blue-dark: #0054e3;
-        --xp-blue-light: #3a81f7;
-        --xp-face: #ece9d8;
-        --xp-face-light: #f5f4ef;
-        --xp-green: #3fae3c;
-        --xp-green-light: #77e377;
-    }
-
-    * { box-sizing: border-box; }
-
-    @keyframes popIn {
-        0% { opacity: 0; transform: scale(0.9) translateY(20px); }
-        100% { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    @keyframes fillBar { to { width: var(--target-width); } }
-
-    @keyframes blink { 50% { opacity: 0.35; } }
-
-    /* --- Curseur personnalisé façon XP (flèche blanche, contour noir) --- */
-    html, body {
-        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 2 L4 20 L8.5 16 L11 22 L14 20.5 L11.5 14.5 L18 14.5 Z" fill="white" stroke="black" stroke-width="1.3" stroke-linejoin="round"/></svg>') 2 2, auto;
-        margin: 0;
-        height: 100vh;
-        overflow: hidden;
-        font-family: 'Tahoma', 'Segoe UI', sans-serif;
-    }
-
-    a, button, .icone-bureau, .barre-titre, .bouton-demarrer, .item-menu {
-        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 2 L4 20 L8.5 16 L11 22 L14 20.5 L11.5 14.5 L18 14.5 Z" fill="white" stroke="black" stroke-width="1.3" stroke-linejoin="round"/></svg>') 2 2, pointer;
-    }
-
-    /* --- Scrollbar façon XP --- */
-    .scroll-xp::-webkit-scrollbar { width: 17px; height: 17px; }
-    .scroll-xp::-webkit-scrollbar-track { background: #d4d0c8; border-left: 1px solid #999; }
-    .scroll-xp::-webkit-scrollbar-thumb {
-        background: linear-gradient(to right, #e8e6df, #c6c3ba);
-        border: 1px solid #999;
-        border-radius: 2px;
-    }
-    .scroll-xp::-webkit-scrollbar-button {
-        background: var(--xp-face) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><polygon points="5,2 9,8 1,8" fill="black"/></svg>') no-repeat center;
-        background-size: 8px;
-        border: 1px solid #999;
-        height: 17px;
-    }
-
-    /* ================= BOOT SCREEN ================= */
-    #ecran-demarrage {
-        position: fixed; inset: 0; background: #000;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        z-index: 9999; color: white; font-family: 'Tahoma', sans-serif;
-        transition: opacity 0.8s ease;
-    }
-    #ecran-demarrage .logo-boot {
-        display: flex; align-items: center; gap: 10px;
-        font-size: 22px; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 30px;
-        color: #ffffff;
-    }
-    #ecran-demarrage .logo-boot .drapeau {
-        display: flex; flex-wrap: wrap; width: 20px; height: 20px; gap: 2px;
-    }
-    #ecran-demarrage .logo-boot .drapeau span {
-        width: 9px; height: 9px;
-    }
-    #ecran-demarrage .logo-boot .drapeau span:nth-child(1) { background: #ff8a3d; }
-    #ecran-demarrage .logo-boot .drapeau span:nth-child(2) { background: #3dc7ff; }
-    #ecran-demarrage .logo-boot .drapeau span:nth-child(3) { background: #3dff6e; }
-    #ecran-demarrage .logo-boot .drapeau span:nth-child(4) { background: #ffd23d; }
-    .barre-chargement-boot {
-        width: 220px; height: 14px; border: 1px solid #4a4a4a; border-radius: 3px; overflow: hidden;
-        background: #111; padding: 2px;
-    }
-    .barre-chargement-boot-inner {
-        height: 100%; width: 40%; border-radius: 2px;
-        background: linear-gradient(to right, #1c53c9, #4d8ef7);
-        animation: courseBoot 1.1s ease-in-out infinite;
-    }
-    @keyframes courseBoot {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(350%); }
-    }
-    #ecran-demarrage .sous-texte { margin-top: 14px; font-size: 11px; color: #aaa; }
-
-    /* ================= ECRAN ARRET ================= */
-    #ecran-arret {
-        position: fixed; inset: 0; background: #000; z-index: 10000;
-        display: none; align-items: center; justify-content: center;
-        color: #aab7d6; font-size: 15px; letter-spacing: .5px;
-    }
-
-    /* ================= BUREAU ================= */
-    #bureau {
-        position: fixed; inset: 0;
-        background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
-                    linear-gradient(160deg, #2d6fd6 0%, #1a4faa 55%, #0f3a8c 100%);
-        overflow: hidden;
-    }
-
-    .icones-bureau {
-        position: absolute; top: 16px; left: 16px;
-        display: flex; flex-direction: column; gap: 22px;
-    }
-
-    .icone-bureau {
-        width: 74px; display: flex; flex-direction: column; align-items: center;
-        gap: 4px; padding: 6px 2px; border: 1px solid transparent; border-radius: 3px;
-        user-select: none;
-    }
-    .icone-bureau:hover, .icone-bureau.selectionnee {
-        background: rgba(60, 110, 220, 0.35);
-        border: 1px dotted rgba(255,255,255,0.6);
-    }
-    .icone-bureau .glyphe {
-        font-size: 30px;
-        filter: drop-shadow(1px 2px 1px rgba(0,0,0,0.6));
-    }
-    .icone-bureau span {
-        color: white; font-size: 11px; text-align: center;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
-        line-height: 1.2;
-    }
-
-    /* ================= FENETRES ================= */
-    .fenetre-xp {
-        position: absolute;
-        background-color: var(--xp-face);
-        border: 3px solid var(--xp-blue-dark);
-        border-top: 3px solid var(--xp-blue-light);
-        box-shadow: 10px 10px 0px rgba(0,0,0,0.45);
-        display: flex; flex-direction: column;
-        animation: popIn 0.25s ease-out;
-        min-width: 280px;
-        min-height: 180px;
-    }
-    .fenetre-xp.active { box-shadow: 12px 12px 0px rgba(0,0,0,0.55); }
-    .fenetre-xp.masquee { display: none; }
-    .fenetre-xp.maximisee {
-        top: 0 !important; left: 0 !important;
-        width: 100% !important; height: calc(100% - 40px) !important;
-        border-width: 2px;
-    }
-
-    .barre-titre {
-        display: flex; justify-content: space-between; align-items: center;
-        background: linear-gradient(to bottom, #0058e6 0%, #3a81f7 100%);
-        color: white; padding: 5px 6px 5px 8px; font-weight: bold;
-        font-size: 13px; text-shadow: 1px 1px #002288;
-        user-select: none;
-    }
-    .fenetre-xp:not(.active) .barre-titre {
-        background: linear-gradient(to bottom, #7a95c7 0%, #a9bce0 100%);
-    }
-    .titre-gauche { display: flex; align-items: center; gap: 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-
-    .boutons-fenetre { display: flex; gap: 3px; flex-shrink: 0; }
-    .btn-fenetre {
-        width: 21px; height: 19px; border: 1px solid #003399;
-        border-radius: 2px; display: flex; align-items: center; justify-content: center;
-        font-size: 11px; font-weight: bold; color: #1b3a7a;
-        background: linear-gradient(to bottom, #ffffff, #d9e4f5);
-    }
-    .btn-fenetre:hover { filter: brightness(1.1); }
-    .btn-fenetre.fermer { background: linear-gradient(to bottom, #f97f89, #e81123); color: white; border-color: #750009; }
-
-    .menu-fenetre {
-        display: flex; gap: 14px; background: var(--xp-face);
-        padding: 3px 10px; font-size: 12px; border-bottom: 1px solid #b7b19a;
-    }
-
-    .onglets {
-        display: flex; background-color: var(--xp-face); padding: 5px 10px 0 10px;
-        gap: 5px; border-bottom: 1px solid #999;
-    }
-    .onglets button {
-        background-color: var(--xp-face); border: 1px solid #999; border-bottom: none;
-        padding: 5px 12px; font-family: 'Tahoma', sans-serif; font-size: 12px; border-radius: 4px 4px 0 0;
-    }
-    .onglets button.actif { background-color: var(--xp-face-light); font-weight: bold; padding-bottom: 7px; }
-
-    .corps-fenetre {
-        flex: 1; overflow: auto; background: var(--xp-face-light);
-    }
-
-    .contenu-principal { display: flex; gap: 18px; padding: 18px; }
-    .colonne-gauche { display: flex; flex-direction: column; gap: 10px; width: 42%; }
-    .colonne-gauche a {
-        background-color: #ffffff; color: black; text-decoration: none; padding: 9px 10px;
-        border: 1px solid #7f9db9; border-radius: 3px; font-size: 13px;
-        box-shadow: inset 1px 1px 0px #fff, 1px 1px 2px rgba(0,0,0,0.1);
-        display: flex; align-items: center; gap: 10px; transition: all .15s ease;
-    }
-    .colonne-gauche a:hover { background-color: var(--xp-blue-dark); color: white; border-color: #002288; transform: translateX(4px); }
-    .logo-lien { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
-    .colonne-droite { width: 58%; background: white; border: 1px inset #ccc; padding: 14px; }
-    .colonne-droite h3 { margin-top: 0; font-size: 14px; border-bottom: 2px solid var(--xp-blue-dark); padding-bottom: 5px; }
-
-    .skill-container { margin-bottom: 12px; }
-    .skill-title { font-size: 12px; margin-bottom: 3px; font-weight: bold; display: flex; justify-content: space-between; }
-    .skill-bar { background-color: #e0e0e0; height: 12px; border: 1px solid #999; border-radius: 2px; overflow: hidden; padding: 1px; }
-    .skill-level {
-        height: 100%; width: 0%; border-radius: 1px; animation: fillBar 1s ease-out forwards;
-        background-image: repeating-linear-gradient(to right, var(--xp-green) 0px, var(--xp-green-light) 3px, var(--xp-green) 6px);
-        box-shadow: inset 0 2px 2px rgba(255,255,255,0.35), inset 0 -2px 2px rgba(0,0,0,0.15);
-    }
-
-    .contenu-liens { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-    .contenu-liens a {
-        background-color: #ffffff; color: black; text-decoration: none; padding: 10px;
-        border: 1px solid #7f9db9; border-radius: 3px; font-size: 14px;
-        display: flex; align-items: center; gap: 10px; transition: all .15s ease;
-    }
-    .contenu-liens a:hover { background-color: var(--xp-blue-dark); color: white; transform: translateX(5px); }
-
-    .poignee-redim {
-        position: absolute; right: 0; bottom: 0; width: 16px; height: 16px;
-        background: repeating-linear-gradient(135deg, transparent 0 2px, #7f9db9 2px 3px);
-    }
-
-    /* "My Computer" window */
-    .liste-lecteurs { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-    .lecteur { display: flex; align-items: center; gap: 10px; background: white; border: 1px solid #a9c1e0; padding: 8px; border-radius: 3px; }
-    .lecteur .glyphe { font-size: 22px; }
-    .lecteur .barre-espace { flex: 1; height: 8px; background: #ddd; border: 1px solid #999; border-radius: 2px; overflow: hidden; margin-top: 4px; }
-    .lecteur .barre-espace-inner { height: 100%; background: var(--xp-blue-light); }
-
-    .corbeille-vide { padding: 30px; text-align: center; color: #666; font-size: 13px; }
-
-    /* "My Creations" window */
-    .filtres-creations {
-        display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px 0 16px;
-    }
-    .filtre-creation {
-        background: var(--xp-face); border: 1px solid #7f9db9; border-radius: 3px;
-        padding: 4px 10px; font-size: 11px; font-family: 'Tahoma', sans-serif;
-    }
-    .filtre-creation:hover { background: #dbe8ff; }
-    .filtre-creation.actif { background: var(--xp-blue-dark); color: white; border-color: #002288; }
-    .grille-creations {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 12px; padding: 16px;
-    }
-    .vignette-creation {
-        background: white; border: 1px solid #7f9db9; border-radius: 3px; overflow: hidden;
-        box-shadow: 1px 1px 3px rgba(0,0,0,0.15); display: flex; flex-direction: column;
-    }
-    .vignette-creation .image-vignette {
-        width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;
-        background: linear-gradient(135deg, #dce7fb, #b9cdf2);
-    }
-    .vignette-creation .legende {
-        padding: 6px 8px; font-size: 11px; text-align: center; border-top: 1px solid #d8d8d8;
-    }
-    .vignette-creation:hover { outline: 2px solid var(--xp-blue-dark); }
-
-    #visionneuse {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 6000;
-        display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px;
-    }
-    #visionneuse img { max-width: 85vw; max-height: 75vh; border: 4px solid var(--xp-face); box-shadow: 6px 6px 0 rgba(0,0,0,0.5); }
-    #visionneuse .legende-visionneuse { color: white; font-size: 13px; }
-    #visionneuse .fermer-visionneuse {
-        position: absolute; top: 20px; right: 24px; width: 30px; height: 28px;
-        background: linear-gradient(to bottom, #f97f89, #e81123); color: white; border: 1px solid #750009;
-        border-radius: 2px; display: flex; align-items: center; justify-content: center; font-weight: bold;
-    }
-
-    /* proprietes desktop */
-    .contenu-proprietes { padding: 16px; font-size: 12px; line-height: 1.7; }
-
-    /* ================= MENU CONTEXTUEL ================= */
-    .menu-contextuel {
-        position: fixed; display: none; z-index: 5000;
-        background: var(--xp-face); border: 1px solid #6b6b6b; box-shadow: 3px 3px 6px rgba(0,0,0,0.4);
-        min-width: 190px; padding: 3px; font-size: 12px;
-    }
-    .menu-contextuel .item-ctx {
-        padding: 6px 10px 6px 26px; position: relative;
-    }
-    .menu-contextuel .item-ctx:hover { background: var(--xp-blue-dark); color: white; }
-    .menu-contextuel hr { border: none; border-top: 1px solid #c8c4b8; margin: 3px 4px; }
-
-    /* ================= BARRE DES TACHES ================= */
-    #barre-taches {
-        position: fixed; left: 0; right: 0; bottom: 0; height: 40px;
-        background: linear-gradient(to bottom, #2a86ff 0%, #1c5fd6 4%, #1450c4 50%, #1c5fd6 96%, #0b3a99 100%);
-        display: flex; align-items: center; z-index: 4000;
-        box-shadow: 0 -1px 4px rgba(0,0,0,0.5);
-        border-top: 1px solid #6fa9ff;
-    }
-
-    .bouton-demarrer {
-        height: 30px; margin: 4px 6px; padding: 0 14px 0 10px;
-        background: linear-gradient(to bottom, #4fdc55 0%, #2fa838 45%, #1f8a28 55%, #3fd047 100%);
-        border-radius: 5px; border: 1px solid #14591b;
-        color: white; font-weight: bold; font-style: italic; font-size: 14px;
-        display: flex; align-items: center; gap: 6px; text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
-    }
-    .bouton-demarrer:hover { filter: brightness(1.08); }
-    .bouton-demarrer .glyphe { font-size: 16px; }
-
-    .separateur-taches { width: 2px; align-self: stretch; margin: 6px 4px; background: rgba(0,0,0,0.25); border-right: 1px solid rgba(255,255,255,0.2); }
-
-    #boutons-taches { flex: 1; display: flex; gap: 4px; overflow: hidden; height: 30px; align-items: center; }
-    .bouton-tache {
-        height: 28px; max-width: 160px; padding: 0 10px;
-        background: linear-gradient(to bottom, #3f7fe0, #1c56c0);
-        border: 1px solid #0d3a91; border-radius: 3px; color: white; font-size: 12px;
-        display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
-    }
-    .bouton-tache.actif-tache {
-        background: linear-gradient(to bottom, #123c8e, #0a2c70);
-        box-shadow: inset 1px 1px 3px rgba(0,0,0,0.6);
-    }
-
-    #horloge-systeme {
-        color: white; font-size: 12px; padding: 0 14px;
-        border-left: 1px solid rgba(255,255,255,0.3);
-        height: 30px; display: flex; align-items: center; margin: 4px 4px 4px 0;
-        background: linear-gradient(to bottom, #1450c4, #0c3690);
-        border-radius: 3px 0 0 3px;
-    }
-
-    /* ================= MENU DEMARRER ================= */
-    #menu-demarrer {
-        position: fixed; left: 6px; bottom: 40px; width: 280px;
-        background: var(--xp-face-light); border: 2px solid #0054e3; border-radius: 8px 8px 0 0;
-        box-shadow: 4px 4px 10px rgba(0,0,0,0.5); overflow: hidden;
-        display: none; flex-direction: column; z-index: 4500;
-        animation: popIn 0.15s ease-out;
-    }
-    #entete-menu-demarrer {
-        background: linear-gradient(to bottom, #1c5fd6, #0b3a99);
-        color: white; padding: 10px 12px; display: flex; align-items: center; gap: 10px;
-        font-weight: bold; font-size: 14px;
-    }
-    #entete-menu-demarrer .avatar { font-size: 26px; background: rgba(255,255,255,0.15); border-radius: 4px; padding: 4px 8px; }
-    .liste-menu-demarrer { padding: 8px; display: flex; flex-direction: column; gap: 2px; }
-    .item-menu {
-        display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 3px; font-size: 13px;
-    }
-    .item-menu:hover { background: var(--xp-blue-dark); color: white; }
-    .item-menu .glyphe { font-size: 18px; width: 22px; text-align: center; }
-    .pied-menu-demarrer {
-        border-top: 1px solid #b7b19a; padding: 6px 8px; background: var(--xp-face);
-    }
-    .pied-menu-demarrer .item-menu.arret:hover { background: #c0392b; }
-
-    @media (max-width: 620px) {
-        .contenu-principal { flex-direction: column; }
-        .colonne-gauche, .colonne-droite { width: 100%; }
-        .fenetre-xp { left: 10px !important; right: 10px; width: calc(100% - 20px) !important; }
-    }
+  body{margin:0;background:#050507;color:#fff;font-family:'SF Pro Display','Inter',-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .lg-aura{position:fixed;border-radius:9999px;filter:blur(110px);pointer-events:none;z-index:0}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(8vw,6vh) scale(1.15)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-9vw,-5vh) scale(1.2)}}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-12px) rotate(var(--r,0deg))}}
+  @keyframes pop{from{opacity:0;transform:scale(.94) translateY(12px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.6);opacity:0}}
+  /* Verre liquide : flou, fond translucide, bordure fine et reflet supérieur */
+  .lg-glass{position:relative;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.15);
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(255,255,255,.05),0 24px 60px -20px rgba(0,0,0,.7);
+    -webkit-backdrop-filter:blur(40px) saturate(160%);backdrop-filter:blur(40px) saturate(160%)}
+  /* Brillance qui suit le curseur */
+  .lg-spot::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .5s cubic-bezier(.22,1,.36,1);
+    background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.13),transparent 60%)}
+  .lg-spot:hover::before{opacity:1}
+  /* Défilement fluide (en plus de la classe Tailwind scroll-smooth) */
+  html{scroll-behavior:smooth}
+  :root{--e:cubic-bezier(.16,1,.3,1)} /* courbe fluide Apple */
+  /* 1) Animation d'entrée au chargement : fondu + dézoom (.96 → 1) + remontée de 20px, en cascade */
+  [data-in]{opacity:0;transform:translateY(20px) scale(.96)}
+  [data-in].go{opacity:1;transform:none;transition:opacity 1s var(--e) var(--d,0ms),transform 1s var(--e) var(--d,0ms)}
+  /* 2) Scroll reveal : opacité 0→1, translation 30px→0, flou 6px→0 (--d = décalage de la cascade) */
+  [data-rv]{opacity:0;transform:translateY(30px);filter:blur(6px)}
+  [data-rv].vu{opacity:1;transform:none;filter:none;transition:opacity 1s var(--e) var(--d,0ms),transform 1s var(--e) var(--d,0ms),filter 1s var(--e) var(--d,0ms)}
+  /* Pilule en verre liquide qui glisse sous l'onglet actif */
+  #pilule{opacity:0;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 18px -6px rgba(125,211,252,.35);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+    transition:transform .7s cubic-bezier(.16,1,.3,1),width .7s cubic-bezier(.16,1,.3,1),opacity .4s ease}
+  #onglets a{transition:color .4s ease}
+  #onglets a[aria-current="page"]{color:#fff}
+  .ease{transition:transform .6s cubic-bezier(.22,1,.36,1)}
+  /* 1) Reflet de bordure magnétique : un anneau de 1px s'illumine autour du curseur (--mx / --my) */
+  .lg-spot::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;transition:opacity .5s var(--e);
+    background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.9),rgba(186,230,253,.3) 45%,transparent 70%);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;
+    mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude}
+  .lg-spot:hover::after{opacity:1}
+  /* 2) Inclinaison 3D des créations + reflet diagonal (--rx, --ry, --ty, --sp posés par le script) */
+  .tilt{transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px));transition:transform .7s var(--e);will-change:transform}
+  .tilt.actif{transition:transform .14s ease-out}
+  .shine{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .4s ease;
+    background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.3) 50%,transparent 62%);background-size:300% 100%;background-position:var(--sp,50%) 0}
+  .tilt:hover .shine{opacity:1}
+  /* 3) Comparateur Avant / Après : le curseur est un <input range> invisible (souris, tactile et clavier) */
+  #comparateur{position:relative;overflow:hidden;aspect-ratio:16/9;border-radius:22px;user-select:none;-webkit-user-select:none}
+  #cmp-range{-webkit-appearance:none;appearance:none;position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;touch-action:pan-y}
+  #cmp-range::-webkit-slider-thumb{-webkit-appearance:none;width:2px;height:100%}
+  #cmp-range::-moz-range-thumb{width:2px;height:100%;border:0;background:transparent}
+  .cmp-knob{position:absolute;top:50%;left:var(--pos);width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:9999px;display:flex;align-items:center;justify-content:center;pointer-events:none;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),0 8px 24px rgba(0,0,0,.5);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  #cmp-range:focus-visible ~ .cmp-knob{box-shadow:0 0 0 3px rgba(125,211,252,.85),0 8px 24px rgba(0,0,0,.5)}
+  .cmp-tag{position:absolute;top:12px;padding:5px 12px;border-radius:9999px;font-size:12px;font-weight:600;pointer-events:none;
+    background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.2);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  /* 4) Orbe lumineux qui suit la souris avec inertie */
+  #orbe{position:fixed;left:0;top:0;width:520px;height:520px;border-radius:9999px;pointer-events:none;z-index:0;opacity:0;filter:blur(50px);will-change:transform;transition:opacity 1.2s ease;
+    background:radial-gradient(circle,rgba(167,139,250,.32),rgba(125,211,252,.18) 42%,transparent 70%)}
+  /* 5) Barre de progression du scroll en verre */
+  #progression{position:fixed;top:0;left:0;right:0;height:3px;z-index:60;pointer-events:none;background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  #progression-barre{height:100%;transform-origin:left;transform:scaleX(0);border-radius:0 3px 3px 0;transition:transform .12s linear;
+    background:linear-gradient(90deg,rgba(125,211,252,.9),rgba(196,181,253,.95),#fff);box-shadow:0 0 12px rgba(125,211,252,.75),0 0 2px rgba(255,255,255,.9)}
+  /* Mouvement réduit (réglage du système) : on coupe seulement les boucles infinies
+     (auras, flottement, pulsation). Les apparitions et transitions restent actives. */
+  @media (prefers-reduced-motion:reduce){[style*="animation"]{animation:none!important}}
 </style>
+<noscript><style>[data-in],[data-rv]{opacity:1!important;transform:none!important;filter:none!important}</style></noscript>
 </head>
 <body>
 
-<audio id="son-clic" preload="auto"><source src="assets/audio/click-sfx.mp3"></audio>
-
-<!-- ECRAN DE DEMARRAGE -->
-<div id="ecran-demarrage">
-    <div class="logo-boot">
-        <div class="drapeau"><span></span><span></span><span></span><span></span></div>
-        Zero_Graph
-    </div>
-    <div class="barre-chargement-boot"><div class="barre-chargement-boot-inner"></div></div>
-    <div class="sous-texte">Starting Windows...</div>
+<!-- Auras lumineuses -->
+<div aria-hidden="true">
+  <div class="lg-aura" style="width:55vw;height:55vw;top:-15%;left:-10%;background:rgba(125,211,252,.22);animation:drift1 28s ease-in-out infinite"></div>
+  <div class="lg-aura" style="width:50vw;height:50vw;top:30%;right:-15%;background:rgba(91,33,182,.35);animation:drift2 34s ease-in-out infinite"></div>
+  <div class="lg-aura" style="width:35vw;height:35vw;bottom:-10%;left:25%;background:rgba(255,255,255,.08);animation:drift1 40s ease-in-out infinite"></div>
 </div>
 
-<!-- SHUTDOWN SCREEN -->
-<div id="ecran-arret">Signing out...</div>
+<!-- 4) Orbe ambiant qui suit la souris -->
+<div id="orbe" aria-hidden="true"></div>
+<!-- 5) Barre de progression du scroll -->
+<div id="progression" aria-hidden="true"><div id="progression-barre"></div></div>
 
-<!-- DESKTOP -->
-<div id="bureau">
-    <div class="icones-bureau">
-        <div class="icone-bureau" data-fenetre="fenetre-principale" tabindex="0">
-            <div class="glyphe">📁</div><span>Portfolio.exe</span>
-        </div>
-        <div class="icone-bureau" data-fenetre="fenetre-liens" tabindex="0">
-            <div class="glyphe">🌐</div><span>My Links</span>
-        </div>
-        <div class="icone-bureau" data-fenetre="fenetre-creations" tabindex="0">
-            <div class="glyphe">🖼️</div><span>My Creations</span>
-        </div>
-        <div class="icone-bureau" data-fenetre="fenetre-poste" tabindex="0">
-            <div class="glyphe">💻</div><span>My Computer</span>
-        </div>
-        <div class="icone-bureau" data-fenetre="fenetre-corbeille" tabindex="0">
-            <div class="glyphe">🗑️</div><span>Recycle Bin</span>
-        </div>
-    </div>
+<!-- Toast style Dynamic Island -->
+<div class="fixed left-1/2 top-3 z-[100] -translate-x-1/2 pointer-events-none" role="status" aria-live="polite">
+  <div id="toast" class="flex items-center gap-2 overflow-hidden rounded-full bg-black text-sm font-medium text-white"
+       style="border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 40px rgba(0,0,0,.6);height:40px;width:36px;padding:0;opacity:0;transform:translateY(-14px);transition:all .6s cubic-bezier(.22,1,.36,1)">
+    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-400 text-black" data-ico="check" data-taille="13"></span>
+    <span id="toast-texte" class="whitespace-nowrap">Lien copié !</span>
+  </div>
 </div>
 
-<!-- DESKTOP CONTEXT MENU -->
-<div class="menu-contextuel" id="menu-contextuel">
-    <div class="item-ctx" id="ctx-actualiser">🔄 Refresh</div>
-    <div class="item-ctx" id="ctx-arranger">🧭 Arrange Icons</div>
-    <hr>
-    <div class="item-ctx" id="ctx-nouveau">🗂️ New Folder</div>
-    <hr>
-    <div class="item-ctx" id="ctx-proprietes">⚙️ Properties</div>
+<!-- Barre de navigation flottante : les liens changent de vue, la pilule glisse sous l'onglet actif -->
+<header class="fixed inset-x-0 top-4 z-50 flex justify-center px-3">
+  <nav data-in class="lg-glass lg-spot flex w-full max-w-3xl items-center justify-center gap-2 rounded-full p-2 sm:justify-between sm:pl-5">
+    <a href="#apropos" data-vue="apropos" class="hidden whitespace-nowrap text-sm font-bold tracking-tight sm:block">Tsuketsu ZRG</a>
+    <div id="onglets" class="relative flex items-center">
+      <span id="pilule" aria-hidden="true" class="pointer-events-none absolute left-0 top-0 rounded-full"></span>
+      <a href="#apropos" data-vue="apropos" class="relative block rounded-full px-2.5 py-1.5 text-[13px] text-[#A1A1AA] hover:text-white sm:px-3 sm:text-sm">À propos</a>
+      <a href="#competences" data-vue="competences" class="relative block rounded-full px-2.5 py-1.5 text-[13px] text-[#A1A1AA] hover:text-white sm:px-3 sm:text-sm">Compétences</a>
+      <a href="#creations" data-vue="creations" class="relative block rounded-full px-2.5 py-1.5 text-[13px] text-[#A1A1AA] hover:text-white sm:px-3 sm:text-sm">Créations</a>
+      <a href="#contact" data-vue="contact" class="relative block rounded-full px-2.5 py-1.5 text-[13px] text-[#A1A1AA] hover:text-white sm:px-3 sm:text-sm">Contact</a>
+    </div>
+    <a data-discord target="_blank" rel="noreferrer" class="hidden rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition-transform hover:scale-105 active:scale-95 sm:inline-block">Me contacter</a>
+  </nav>
+</header>
+
+<main class="relative z-10">
+
+  <!-- Hero -->
+  <section id="apropos" class="mx-auto grid min-h-screen max-w-6xl items-center gap-12 px-5 pb-16 pt-32 lg:grid-cols-2">
+    <div>
+      <div id="badge-dispo" data-in class="lg-glass mb-6 inline-flex items-center gap-2.5 rounded-full px-4 py-2 text-sm text-[#d4d4d8]">
+        <span class="relative flex h-2.5 w-2.5"><span class="absolute inset-0 rounded-full bg-emerald-400" style="animation:ping 2s infinite"></span><span class="relative h-2.5 w-2.5 rounded-full bg-emerald-400"></span></span>
+        Disponible pour projets / commandes
+      </div>
+      <h1 id="nom" data-in class="text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl"></h1>
+      <p id="titre" data-in class="mt-4 text-lg font-semibold text-white/90 sm:text-xl"></p>
+      <p id="bio" data-in class="mt-5 max-w-md text-base leading-relaxed text-[#A1A1AA]"></p>
+      <div data-in class="mt-8 flex flex-wrap gap-3">
+        <a href="#creations" data-vue="creations" class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition-transform hover:scale-105">Voir mes créations <span data-ico="arrow" data-taille="16"></span></a>
+        <a href="#contact" data-vue="contact" class="lg-glass inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors hover:bg-white/10">Passer commande</a>
+      </div>
+    </div>
+    <!-- Aperçu visuel : cartes en verre flottantes (images remplies par le script) -->
+    <div data-in class="relative mx-auto h-[420px] w-full max-w-md sm:h-[480px]">
+      <div class="lg-glass lg-spot absolute left-0 top-4 w-[78%] rounded-3xl p-2" style="--r:-4deg;animation:float 7s ease-in-out infinite"><img id="hero-1" alt="" class="aspect-video w-full rounded-2xl object-cover"></div>
+      <div class="lg-glass lg-spot absolute bottom-6 right-0 w-[46%] rounded-3xl p-2" style="--r:5deg;animation:float 8s ease-in-out -2s infinite"><img id="hero-2" alt="" class="aspect-square w-full rounded-2xl object-cover"></div>
+      <div class="lg-glass lg-spot absolute bottom-0 left-4 w-[44%] rounded-3xl p-2" style="--r:-2deg;animation:float 9s ease-in-out -4s infinite"><img id="hero-3" alt="" class="aspect-square w-full rounded-2xl object-cover"></div>
+      <div class="lg-glass absolute right-2 top-0 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium" style="--r:3deg;animation:float 6s ease-in-out -1s infinite"><span class="text-sky-300" data-ico="sparkles" data-taille="15"></span> 3D · VFX · Motion</div>
+    </div>
+  </section>
+
+  <!-- Compétences -->
+  <section id="competences" class="mx-auto max-w-6xl px-5 py-24">
+    <div data-rv>
+      <h2 class="text-4xl font-bold tracking-tight sm:text-5xl">Compétences</h2>
+      <p class="mt-3 max-w-xl text-[#A1A1AA]">Les outils que je maîtrise et mon niveau d'expertise dans chacun.</p>
+    </div>
+    <div id="grille-competences" data-grille class="mt-10 grid grid-cols-1 gap-4 md:auto-rows-[minmax(190px,auto)] md:grid-cols-4"></div>
+  </section>
+
+  <!-- Créations -->
+  <section id="creations" class="mx-auto max-w-6xl px-5 py-24">
+    <div data-rv>
+      <h2 class="text-4xl font-bold tracking-tight sm:text-5xl">Créations</h2>
+      <p class="mt-3 max-w-xl text-[#A1A1AA]">Touche une création pour la voir en grand et découvrir les logiciels utilisés.</p>
+    </div>
+    <div data-rv class="mt-8 overflow-x-auto pb-1">
+      <div id="filtres" role="tablist" class="lg-glass inline-flex gap-1 rounded-full p-1.5"></div>
+    </div>
+    <div id="grille-creations" data-grille class="mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-12"></div>
+
+    <!-- 3) Avant / Après : place tes images dans le dossier ./assets/ (avant.png = image brute, apres.png = rendu final) -->
+    <div data-rv class="mt-10">
+      <div class="lg-glass lg-spot rounded-[32px] p-3 sm:p-4">
+        <div class="flex flex-wrap items-end justify-between gap-3 px-2 pb-4 pt-2 sm:px-3">
+          <div>
+            <h3 class="text-2xl font-bold tracking-tight sm:text-3xl">Avant / Après</h3>
+            <p class="mt-1 text-sm text-[#A1A1AA]">Glisse le curseur pour comparer l'image brute et le rendu final.</p>
+          </div>
+          <div class="flex gap-2">
+            <span class="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-medium">Photoshop</span>
+            <span class="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-medium">Blender</span>
+          </div>
+        </div>
+        <div id="comparateur" class="relative aspect-video select-none overflow-hidden rounded-[22px]" style="--pos:50%;background:#0a0a0f">
+          <!-- APRÈS (rendu final) : image du fond -->
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#0c4a6e,#5b21b6)">
+            <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:rgba(255,255,255,.7)">./assets/apres.png</span>
+            <img src="./assets/apres.png" alt="Rendu final" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"
+                 onload="this.previousElementSibling.style.display='none'" onerror="this.remove()">
+          </div>
+          <!-- AVANT (image brute) : recouvre la partie gauche, découpée par --pos -->
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#27272a,#52525b);clip-path:inset(0 calc(100% - var(--pos)) 0 0)">
+            <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:rgba(255,255,255,.7)">./assets/avant.png</span>
+            <img src="./assets/avant.png" alt="Image brute" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"
+                 onload="this.previousElementSibling.style.display='none'" onerror="this.remove()">
+          </div>
+          <span class="cmp-tag" style="left:12px">Avant</span>
+          <span class="cmp-tag" style="right:12px">Après</span>
+          <div style="position:absolute;top:0;bottom:0;left:var(--pos);width:2px;margin-left:-1px;background:rgba(255,255,255,.85);box-shadow:0 0 14px rgba(255,255,255,.7);pointer-events:none"></div>
+          <input id="cmp-range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparer avant et après">
+          <div class="cmp-knob" aria-hidden="true"><span data-ico="swap" data-taille="20"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="mx-auto max-w-5xl px-5 pb-16 pt-24">
+    <div data-rv>
+      <div class="lg-glass lg-spot rounded-[40px] px-6 py-14 text-center sm:px-12 sm:py-20">
+        <div class="pointer-events-none absolute left-1/2 top-0 h-56 w-[70%] -translate-x-1/2 rounded-full bg-sky-300/20 blur-3xl"></div>
+        <div class="relative">
+          <h2 class="text-4xl font-bold tracking-tight sm:text-6xl">Un projet en tête ?</h2>
+          <p class="mx-auto mt-4 max-w-md text-[#A1A1AA]">Miniature, logo, bannière ou scène 3D : rejoins mon serveur Discord, je réponds vite.</p>
+          <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <a data-discord target="_blank" rel="noreferrer" class="inline-flex items-center gap-2.5 rounded-full bg-white px-7 py-3.5 font-semibold text-black transition-transform hover:scale-105 active:scale-95"><span data-ico="message" data-taille="18"></span> Rejoindre mon Discord</a>
+            <button id="btn-copier" aria-label="Copier le lien du serveur Discord" class="lg-glass inline-flex items-center gap-2 rounded-full px-5 py-3.5 font-semibold transition-colors hover:bg-white/10"><span data-ico="copy" data-taille="16"></span> Copier le lien</button>
+            <a id="btn-mail" class="lg-glass inline-flex items-center gap-2 rounded-full px-7 py-3.5 font-semibold transition-colors hover:bg-white/10"><span data-ico="mail" data-taille="18"></span> E-mail</a>
+          </div>
+          <div id="reseaux" class="mt-10 flex flex-wrap justify-center gap-3"></div>
+        </div>
+      </div>
+    </div>
+    <p id="copyright" data-rv class="mt-10 text-center text-sm text-[#71717a]"></p>
+  </section>
+</main>
+
+<!-- Lightbox -->
+<div id="lightbox" class="fixed inset-0 z-[90] hidden items-center justify-center p-4" role="dialog" aria-modal="true"
+     style="background:rgba(5,5,7,.7);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px)">
+  <div id="lb-carte" class="lg-glass max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-[32px] p-3">
+    <button id="lb-fermer" aria-label="Fermer" class="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/50 transition-colors hover:bg-white/20"><span data-ico="x" data-taille="18"></span></button>
+    <img id="lb-img" alt="" class="max-h-[60vh] w-full rounded-3xl bg-black/40 object-contain">
+    <div class="p-5 sm:p-6">
+      <span id="lb-cat" class="text-sm text-[#A1A1AA]"></span>
+      <h3 id="lb-titre" class="mt-1 text-2xl font-bold sm:text-3xl"></h3>
+      <p id="lb-desc" class="mt-3 max-w-2xl text-[#A1A1AA]"></p>
+      <div id="lb-logiciels" class="mt-5 flex flex-wrap items-center gap-2"></div>
+    </div>
+  </div>
 </div>
-
-<!-- VISIONNEUSE D'IMAGE -->
-<div id="visionneuse">
-    <div class="fermer-visionneuse" id="fermer-visionneuse">×</div>
-    <img id="image-visionneuse" src="" alt="">
-    <div class="legende-visionneuse" id="legende-visionneuse"></div>
-</div>
-
-<!-- TASKBAR -->
-<div id="barre-taches">
-    <div class="bouton-demarrer" id="bouton-demarrer"><span class="glyphe">🪟</span>start</div>
-    <div class="separateur-taches"></div>
-    <div id="boutons-taches"></div>
-    <div id="horloge-systeme">--:--</div>
-</div>
-
-<!-- START MENU -->
-<div id="menu-demarrer">
-    <div id="entete-menu-demarrer"><span class="avatar">🙂</span>huggy_jumper</div>
-    <div class="liste-menu-demarrer">
-        <div class="item-menu" data-fenetre="fenetre-principale"><span class="glyphe">📁</span>Portfolio.exe</div>
-        <div class="item-menu" data-fenetre="fenetre-liens"><span class="glyphe">🌐</span>My Links</div>
-        <div class="item-menu" data-fenetre="fenetre-creations"><span class="glyphe">🖼️</span>My Creations</div>
-        <div class="item-menu" data-fenetre="fenetre-poste"><span class="glyphe">💻</span>My Computer</div>
-        <div class="item-menu" data-fenetre="fenetre-corbeille"><span class="glyphe">🗑️</span>Recycle Bin</div>
-    </div>
-    <div class="pied-menu-demarrer">
-        <div class="item-menu arret" id="item-arret"><span class="glyphe">🔴</span>Shut Down...</div>
-    </div>
-</div>
-
-<!-- TEMPLATE DES FENETRES (générées en JS à partir de ces blocs cachés) -->
-<template id="tpl-fenetre-principale">
-    <div class="menu-fenetre"><span>File</span><span>Edit</span><span>View</span><span>?</span></div>
-    <div class="onglets">
-        <button class="actif">about me</button>
-        <button>More...Coming Soon</button>
-    </div>
-    <div class="contenu-principal">
-        <div class="colonne-gauche">
-            <a href="https://www.youtube.com/@huggy_jumper" target="_blank"><img class="logo-lien" src="assets/images/logo-youtube.png" alt="YT">Youtube</a>
-            <a href="https://www.twitch.tv/zerographv2" target="_blank"><img class="logo-lien" src="assets/images/logo-twitch.png" alt="Twitch">Twitch</a>
-            <a href="https://discord.gg/uDRufkr4eX" target="_blank"><img class="logo-lien" src="assets/images/logo-discord.png" alt="Discord">Discord</a>
-            <a href="https://www.tiktok.com/@huggy_jumper" target="_blank"><img class="logo-lien" src="assets/images/logo-tiktok.png" alt="Tiktok">Tiktok</a>
-        </div>
-        <div class="colonne-droite">
-            <h3>My Skills</h3>
-            <div class="skill-container">
-                <div class="skill-title"><span>Graphics</span><span>50%</span></div>
-                <div class="skill-bar"><div class="skill-level" style="--target-width: 50%;"></div></div>
-            </div>
-            <div class="skill-container">
-                <div class="skill-title"><span>3D</span><span>25%</span></div>
-                <div class="skill-bar"><div class="skill-level" style="--target-width: 25%;"></div></div>
-            </div>
-            <div class="skill-container">
-                <div class="skill-title"><span>Html/css</span><span>10%</span></div>
-                <div class="skill-bar"><div class="skill-level" style="--target-width: 10%;"></div></div>
-            </div>
-        </div>
-    </div>
-</template>
-
-<template id="tpl-fenetre-liens">
-    <div class="contenu-liens">
-        <a href="https://www.youtube.com/@huggy_jumper" target="_blank"><img class="logo-lien" src="assets/images/logo-youtube.png" alt="YT">Youtube</a>
-        <a href="https://www.twitch.tv/zerographv2" target="_blank"><img class="logo-lien" src="assets/images/logo-twitch.png" alt="Twitch">Twitch</a>
-        <a href="https://discord.gg/uDRufkr4eX" target="_blank"><img class="logo-lien" src="assets/images/logo-discord.png" alt="Discord">Discord</a>
-        <a href="https://www.tiktok.com/@huggy_jumper" target="_blank"><img class="logo-lien" src="assets/images/logo-tiktok.png" alt="Tiktok">Tiktok</a>
-    </div>
-</template>
-
-<template id="tpl-fenetre-creations">
-    <div class="filtres-creations">
-        <button class="filtre-creation actif" data-categorie="all">All</button>
-        <button class="filtre-creation" data-categorie="thumbnail">Thumbnails</button>
-        <button class="filtre-creation" data-categorie="youtube-banner">YouTube Banners</button>
-        <button class="filtre-creation" data-categorie="discord-banner">Discord Banners</button>
-        <button class="filtre-creation" data-categorie="pfp">Profile Pictures</button>
-    </div>
-    <div class="grille-creations">
-        <div class="vignette-creation" data-categorie="thumbnail" data-titre="Thumbnail Not Official Byilhan">
-            <img class="image-vignette" src="assets/images/creations/thumbnail-1.jpg" alt="Thumbnail 1" onerror="this.style.opacity=0">
-            <div class="legende">Thumbnail Not Official Byilhan</div>
-        </div>
-        <div class="vignette-creation" data-categorie="youtube-banner" data-titre="YouTube Banner 1">
-            <img class="image-vignette" src="assets/images/creations/youtube-banner-1.jpg" alt="YouTube Banner 1" onerror="this.style.opacity=0">
-            <div class="legende">YouTube Banner 1</div>
-        </div>
-        <div class="vignette-creation" data-categorie="discord-banner" data-titre="Discord Banner Fap Marin Kitagawa">
-            <img class="image-vignette" src="assets/images/creations/discord-banner-1.jpg" alt="Discord Banner 1" onerror="this.style.opacity=0">
-            <div class="legende">Discord Banner Fap Marin Kitagawa</div>
-            </div>
-        <div class="vignette-creation" data-categorie="discord-banner" data-titre="Discord Banner Ayon Kaoruko Waguri V1">
-            <img class="image-vignette" src="assets/images/creations/discord-banner-2.jpg" alt="Discord Banner 1" onerror="this.style.opacity=0">
-            <div class="legende">Discord Banner Ayon Kaoruko Waguri V1</div>
-        </div>
-         <div class="vignette-creation" data-categorie="discord-banner" data-titre="Banner Anime Header Brush Haimiya [Zero]">
-            <img class="image-vignette" src="assets/images/creations/discord-banner-3.jpg" alt="Discord Banner 1" onerror="this.style.opacity=0">
-            <div class="legende">Banner Anime Header Brush Haimiya [Zero]</div>
-        </div>
-        <div class="vignette-creation" data-categorie="pfp" data-titre="Profile Picture Kirito">
-            <img class="image-vignette" src="assets/images/creations/pfp-1.jpg" alt="Profile Picture 1" onerror="this.style.opacity=0">
-            <div class="legende">Profile Picture Kirito</div>
-        </div>
-        <div class="vignette-creation" data-categorie="pfp" data-titre="Profile Picture Marin Kitagwa">
-            <img class="image-vignette" src="assets/images/creations/pfp-2.jpg" alt="Profile Picture 1" onerror="this.style.opacity=0">
-            <div class="legende">Profile Picture Marin Kitagwa</div>
-        </div>
-        <div class="vignette-creation" data-categorie="pfp" data-titre="Profile Picture Alya">
-            <img class="image-vignette" src="assets/images/creations/pfp-3.jpg" alt="Profile Picture 1" onerror="this.style.opacity=0">
-            <div class="legende">Profile Picture Alya</div>
-        </div>
-    </div>
-</template>
-
-<template id="tpl-fenetre-poste">
-    <div class="liste-lecteurs">
-        <div class="lecteur">
-            <div class="glyphe">💽</div>
-            <div style="flex:1">
-                <div>Local Disk (C:)</div>
-                <div class="barre-espace"><div class="barre-espace-inner" style="width:72%"></div></div>
-            </div>
-        </div>
-        <div class="lecteur">
-            <div class="glyphe">📀</div>
-            <div style="flex:1">
-                <div>Projects (D:)</div>
-                <div class="barre-espace"><div class="barre-espace-inner" style="width:30%"></div></div>
-            </div>
-        </div>
-    </div>
-</template>
-
-<template id="tpl-fenetre-corbeille">
-    <div class="corbeille-vide">🗑️<br><br>The Recycle Bin is empty.</div>
-</template>
-
-<template id="tpl-fenetre-proprietes">
-    <div class="contenu-proprietes">
-        <b>Display</b> — theme: Windows XP (Luna)<br>
-        <b>Resolution</b> — adaptive<br>
-        <b>Background</b> — blue gradient<br>
-        <b>Owner</b> — Zero_Graph
-    </div>
-</template>
 
 <script>
-(function () {
-    const sonClic = document.getElementById('son-clic');
-    function jouerSon() {
-        try { sonClic.currentTime = 0; sonClic.volume = 0.3; sonClic.play().catch(() => {}); } catch (e) {}
-    }
-    document.addEventListener('click', jouerSon);
+/* ══════════════════════════════════════════════════════════════
+   ✏️  ZONE À MODIFIER — toutes tes infos sont ici
+   ══════════════════════════════════════════════════════════════ */
 
-    /* ---------- ECRAN DE DEMARRAGE ---------- */
-    const ecranDemarrage = document.getElementById('ecran-demarrage');
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            ecranDemarrage.style.opacity = '0';
-            setTimeout(() => { ecranDemarrage.style.display = 'none'; ouvrirFenetre('fenetre-principale'); }, 800);
-        }, 1600);
-    });
+// Infos générales
+const PROFIL = {
+  nom: "Tsuketsu ZRG",
+  titre: "Designer Graphique · Créateur de Miniatures, Logos & Artiste 3D/VFX",
+  bio: "Je transforme des idées en visuels qu'on remarque : miniatures YouTube qui donnent envie de cliquer, logos et identités qui restent en tête, scènes 3D et effets qui bougent avec fluidité.",
+  discord: "https://discord.gg/uDRufkr4eX", // ← lien d'invitation de ton serveur Discord
+  email: "contact@exemple.com",             // ← ton e-mail
+  disponible: true,                         // ← false = masque le badge « Disponible »
+};
 
-    /* ---------- HORLOGE ---------- */
-    const horloge = document.getElementById('horloge-systeme');
-    function majHorloge() {
-        const d = new Date();
-        const h = String(d.getHours()).padStart(2, '0');
-        const m = String(d.getMinutes()).padStart(2, '0');
-        horloge.textContent = `${h}:${m}`;
-    }
-    majHorloge();
-    setInterval(majHorloge, 10000);
+// Réseaux — icone : "tiktok" | "instagram" | "twitter" | "mail"
+const RESEAUX = [
+  { nom: "TikTok",    lien: "https://www.tiktok.com/@tsuketsuzrg",   icone: "tiktok" },
+  { nom: "Instagram", lien: "https://www.instagram.com/tsuketsuzg/", icone: "instagram" },
+  { nom: "X / Twitter", lien: "https://x.com/huggyjumpur",           icone: "twitter" },
+];
 
-    /* ---------- GESTION DES FENETRES ---------- */
-    const config = {
-        'fenetre-principale': { titre: 'Portfolio.exe', icone: '📁', largeur: 620, hauteur: 400 },
-        'fenetre-liens':      { titre: 'My Links',      icone: '🌐', largeur: 340, hauteur: 320 },
-        'fenetre-creations':  { titre: 'My Creations',  icone: '🖼️', largeur: 480, hauteur: 400 },
-        'fenetre-poste':      { titre: 'My Computer',   icone: '💻', largeur: 400, hauteur: 260 },
-        'fenetre-corbeille':  { titre: 'Recycle Bin',   icone: '🗑️', largeur: 340, hauteur: 220 },
-        'fenetre-proprietes': { titre: 'Display Properties', icone: '⚙️', largeur: 360, hauteur: 220 }
-    };
+// Compétences (niveau de 0 à 100) — icone : "layers" | "clap" | "box" | "pen" | "code"
+const COMPETENCES = [
+  { nom: "Photoshop", niveau: 80, icone: "layers", couleur: "#7dd3fc", span: "md:col-span-2 md:row-span-2",
+    desc: "Retouche, compositing, miniatures YouTube à fort taux de clic et bannières.", tags: ["Retouche", "Compositing", "Miniatures", "Bannières"] },
+  { nom: "After Effects", niveau: 80, icone: "clap", couleur: "#c4b5fd", span: "md:col-span-2",
+    desc: "Motion design, animations fluides et effets visuels.", tags: ["Motion", "VFX"] },
+  { nom: "Blender", niveau: 40, icone: "box", couleur: "#fdba74", span: "md:col-span-1",
+    desc: "Modélisation, rendu, éclairage et scènes 3D.", tags: ["3D", "Rendu"] },
+  { nom: "Logos & Identité", niveau: 90, icone: "pen", couleur: "#f9a8d4", span: "md:col-span-1",
+    desc: "Branding, PDP et direction artistique.", tags: ["Branding", "PDP"] },
+  { nom: "HTML & CSS", niveau: 20, icone: "code", couleur: "#86efac", span: "md:col-span-2",
+    desc: "Bases en intégration web et structure front-end.", tags: ["Intégration", "Front-end"] },
+];
 
-    let zIndexCourant = 100;
-    const fenetresOuvertes = {}; // id -> { el, boutonTache, minimisee }
-    let decalageOuverture = 0;
+// Catégories de la galerie (le premier doit rester "Tout")
+const CATEGORIES = ["Tout", "Miniatures YouTube", "Bannières & PDP", "Logos"];
 
-    function ouvrirFenetre(id) {
-        if (fenetresOuvertes[id]) {
-            const f = fenetresOuvertes[id];
-            f.el.classList.remove('masquee');
-            f.minimisee = false;
-            mettreAuPremierPlan(id);
-            return;
-        }
-        const cfg = config[id];
-        const tpl = document.getElementById('tpl-' + id);
-        const el = document.createElement('div');
-        el.className = 'fenetre-xp';
-        el.id = id;
+/* Créations — pour ajouter/remplacer une image :
+   - image     : lien de ton image (Unsplash = exemples, remplace par tes liens)
+   - format    : "wide" (16:9 miniature) | "pano" (bannière panoramique) | "square" (1:1 PDP/logo)
+   - categorie : doit être EXACTEMENT l'un des noms de CATEGORIES
+   - logiciels : liste affichée dans l'aperçu plein écran
+   Les 3 premières images servent aussi dans le Hero (n°1 : wide, n°3 : square, n°5 : square). */
+const CREATIONS = [
+  // 1. Miniature Avant / Après (16:9)
+  { id: 1, titre: "Édition Avant / Après", categorie: "Miniatures YouTube", format: "wide",
+    image: "./assets/apres.png",
+    description: "Comparatif entre l'image brute et le rendu final retouché.", logiciels: ["Photoshop", "Blender"] },
+  
+  // 2. Bannière 1 (Format panoramique)
+  { id: 2, titre: "Bannière Chaîne — N°1", categorie: "Bannières & PDP", format: "pano",
+    image: "./assets/banniere1.png",
+    description: "Bannière panoramique sur-mesure pour habiller la chaîne YouTube.", logiciels: ["Photoshop"] },
 
-        const bureauRect = document.getElementById('bureau').getBoundingClientRect();
-        const marge = 60;
-        let left = Math.min(bureauRect.width - cfg.largeur - 30, 90 + decalageOuverture);
-        let top = Math.min(bureauRect.height - cfg.hauteur - 60, 60 + decalageOuverture);
-        decalageOuverture = (decalageOuverture + 28) % 160;
+  // 3. Bannière 2 (Format panoramique)
+  { id: 3, titre: "Bannière Chaîne — N°2", categorie: "Bannières & PDP", format: "pano",
+    image: "./assets/banniere2.png",
+    description: "Seconde déclinaison de bannière avec une autre ambiance visuelle.", logiciels: ["Photoshop", "After Effects"] },
 
-        el.style.left = Math.max(10, left) + 'px';
-        el.style.top = Math.max(10, top) + 'px';
-        el.style.width = cfg.largeur + 'px';
-        el.style.height = cfg.hauteur + 'px';
+  // 4. Bannière 3 (Format panoramique)
+  { id: 4, titre: "Bannière Chaîne — N°3", categorie: "Bannières & PDP", format: "pano",
+    image: "./assets/banniere3.png",
+    description: "Bannière immersive aux teintes sombres et soignées.", logiciels: ["Photoshop"] },
 
-        el.innerHTML = `
-            <div class="barre-titre" data-drag="${id}">
-                <div class="titre-gauche"><span>${cfg.icone}</span><span>${cfg.titre}</span></div>
-                <div class="boutons-fenetre">
-                    <div class="btn-fenetre reduire" title="Réduire">_</div>
-                    <div class="btn-fenetre agrandir" title="Agrandir">□</div>
-                    <div class="btn-fenetre fermer" title="Fermer">×</div>
-                </div>
-            </div>
-            <div class="corps-fenetre scroll-xp"></div>
-            <div class="poignee-redim"></div>
-        `;
-        el.querySelector('.corps-fenetre').appendChild(tpl.content.cloneNode(true));
-        document.getElementById('bureau').appendChild(el);
+  // 5. Bannière 4 (Format panoramique)
+  { id: 5, titre: "Bannière Chaîne — N°4", categorie: "Bannières & PDP", format: "pano",
+    image: "./assets/banniere4.png",
+    description: "Quatrième version de bannière orientée branding gaming.", logiciels: ["Photoshop", "Blender"] },
 
-        rendreDeplacable(el, el.querySelector('.barre-titre'));
-        rendreRedimensionnable(el, el.querySelector('.poignee-redim'));
+  // 6. Première Photo de Profil (Carré 1:1)
+  { id: 6, titre: "PDP — Avatar 3D", categorie: "Bannières & PDP", format: "square",
+    image: "./assets/pdp1.png",
+    description: "Photo de profil stylisée pour les réseaux sociaux.", logiciels: ["Blender", "Photoshop"] },
 
-        el.querySelector('.fermer').addEventListener('click', (e) => { e.stopPropagation(); fermerFenetre(id); });
-        el.querySelector('.reduire').addEventListener('click', (e) => { e.stopPropagation(); reduireFenetre(id); });
-        el.querySelector('.agrandir').addEventListener('click', (e) => { e.stopPropagation(); basculerAgrandir(id); });
-        el.addEventListener('mousedown', () => mettreAuPremierPlan(id));
+  // 7. Seconde Photo de Profil (Carré 1:1)
+  { id: 7, titre: "PDP — Minimaliste", categorie: "Bannières & PDP", format: "square",
+    image: "./assets/pdp2.png",
+    description: "Avatar épuré et percutant adapté à toutes les plateformes.", logiciels: ["Photoshop"] },
 
-        const boutonTache = document.createElement('div');
-        boutonTache.className = 'bouton-tache';
-        boutonTache.innerHTML = `<span>${cfg.icone}</span><span>${cfg.titre}</span>`;
-        boutonTache.addEventListener('click', () => {
-            const f = fenetresOuvertes[id];
-            if (f.minimisee) { f.el.classList.remove('masquee'); f.minimisee = false; mettreAuPremierPlan(id); }
-            else if (id === fenetreActive) { reduireFenetre(id); }
-            else { mettreAuPremierPlan(id); }
-        });
-        document.getElementById('boutons-taches').appendChild(boutonTache);
+  // 8. Logo (Carré 1:1)
+  { id: 8, titre: "Logo Officiel — Tsuketsu ZRG", categorie: "Logos", format: "square",
+    image: "./assets/logo.png",
+    description: "Identité visuelle principale et symbole de marque.", logiciels: ["Photoshop"] },
+];
 
-        fenetresOuvertes[id] = { el, boutonTache, minimisee: false };
-        mettreAuPremierPlan(id);
-    }
+/* ══════════════════════════════════════════════════════════════
+   FIN DE LA ZONE À MODIFIER — le reste n'a pas besoin d'être touché
+   ══════════════════════════════════════════════════════════════ */
 
-    let fenetreActive = null;
-    function mettreAuPremierPlan(id) {
-        Object.entries(fenetresOuvertes).forEach(([fid, f]) => {
-            f.el.classList.remove('active');
-            f.boutonTache.classList.remove('actif-tache');
-        });
-        const f = fenetresOuvertes[id];
-        if (!f) return;
-        zIndexCourant += 1;
-        f.el.style.zIndex = zIndexCourant;
-        f.el.classList.add('active');
-        f.boutonTache.classList.add('actif-tache');
-        fenetreActive = id;
-    }
+// Classes de grille selon le format (mobile : 2 colonnes · PC : 12 colonnes)
+const FORMATS = {
+  wide:   { grille: "col-span-2 md:col-span-6",  ratio: "16 / 9" },
+  pano:   { grille: "col-span-2 md:col-span-12", ratio: "3 / 1" },
+  square: { grille: "col-span-1 md:col-span-3",  ratio: "1 / 1" },
+};
 
-    function fermerFenetre(id) {
-        const f = fenetresOuvertes[id];
-        if (!f) return;
-        f.el.remove();
-        f.boutonTache.remove();
-        delete fenetresOuvertes[id];
-        if (fenetreActive === id) fenetreActive = null;
-    }
+// Icônes vectorielles (style Lucide) en SVG intégré
+const ICONES = {
+  layers: '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+  clap: '<path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+  box: '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+  pen: '<path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/>',
+  code: '<path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>',
+  sparkles: '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>',
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  copy: '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  mail: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  instagram: '<rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>',
+  twitter: '<path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>',
+  tiktok: '<circle cx="8" cy="18" r="4"/><path d="M12 18V2l7 4"/>',
+  arrow: '<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
+  max: '<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" x2="14" y1="3" y2="10"/><line x1="3" x2="10" y1="21" y2="14"/>',
+  message: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  swap: '<path d="m9 7-5 5 5 5"/><path d="m15 7 5 5-5 5"/>',
+};
+const ico = (nom, t = 20) => `<svg xmlns="http://www.w3.org/2000/svg" width="${t}" height="${t}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONES[nom]}</svg>`;
+const $ = (s) => document.querySelector(s);
 
-    function reduireFenetre(id) {
-        const f = fenetresOuvertes[id];
-        if (!f) return;
-        f.el.classList.add('masquee');
-        f.minimisee = true;
-        f.boutonTache.classList.remove('actif-tache');
-    }
+/* ---------- Textes du profil ---------- */
+$("#nom").textContent = PROFIL.nom;
+$("#titre").textContent = PROFIL.titre;
+$("#bio").textContent = PROFIL.bio;
+$("#copyright").textContent = `© ${new Date().getFullYear()} ${PROFIL.nom}`;
+$("#btn-mail").href = `mailto:${PROFIL.email}`;
+if (!PROFIL.disponible) $("#badge-dispo").remove();
+document.querySelectorAll("[data-discord]").forEach((a) => (a.href = PROFIL.discord));
+// Images du Hero (réutilisent des créations de la liste)
+$("#hero-1").src = CREATIONS[0].image; $("#hero-2").src = (CREATIONS[2] || CREATIONS[0]).image; $("#hero-3").src = (CREATIONS[4] || CREATIONS[0]).image;
 
-    function basculerAgrandir(id) {
-        const f = fenetresOuvertes[id];
-        if (!f) return;
-        f.el.classList.toggle('maximisee');
-        mettreAuPremierPlan(id);
-    }
+/* ---------- Compétences ---------- */
+$("#grille-competences").innerHTML = COMPETENCES.map((c, i) => `
+  <div data-rv class="${c.span}">
+    <div class="lg-glass lg-spot ease flex h-full flex-col justify-between rounded-[28px] p-6 hover:-translate-y-1">
+      <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-25 blur-3xl" style="background:${c.couleur}"></div>
+      <div class="relative">
+        <span class="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/15 bg-white/5" style="color:${c.couleur}">${ico(c.icone, 24)}</span>
+        <h3 class="mt-5 text-xl font-bold">${c.nom}</h3>
+        <p class="mt-2 text-sm leading-relaxed text-[#A1A1AA]">${c.desc}</p>
+        <div class="mt-4 flex flex-wrap gap-1.5">${c.tags.map((t) => `<span class="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-[#d4d4d8]">${t}</span>`).join("")}</div>
+      </div>
+      <div class="relative mt-6">
+        <div class="mb-2 flex justify-between text-xs text-[#A1A1AA]"><span>Niveau d'expertise</span><span class="font-semibold text-white">${c.niveau}%</span></div>
+        <div class="h-1.5 overflow-hidden rounded-full bg-white/10"><div class="h-full rounded-full" style="width:${c.niveau}%;background:linear-gradient(90deg,${c.couleur}88,${c.couleur})"></div></div>
+      </div>
+    </div>
+  </div>`).join("");
 
-    function rendreDeplacable(el, poignee) {
-        let dx = 0, dy = 0, enCours = false;
-        poignee.addEventListener('mousedown', (e) => {
-            if (el.classList.contains('maximisee')) return;
-            if (e.target.closest('.btn-fenetre')) return;
-            enCours = true;
-            dx = e.clientX - el.offsetLeft;
-            dy = e.clientY - el.offsetTop;
-            mettreAuPremierPlan(el.id);
-        });
-        poignee.addEventListener('touchstart', (e) => {
-            if (el.classList.contains('maximisee')) return;
-            const t = e.touches[0];
-            enCours = true;
-            dx = t.clientX - el.offsetLeft;
-            dy = t.clientY - el.offsetTop;
-            mettreAuPremierPlan(el.id);
-        }, { passive: true });
-        document.addEventListener('mousemove', (e) => {
-            if (!enCours) return;
-            el.style.left = Math.max(0, e.clientX - dx) + 'px';
-            el.style.top = Math.max(0, e.clientY - dy) + 'px';
-        });
-        document.addEventListener('touchmove', (e) => {
-            if (!enCours) return;
-            const t = e.touches[0];
-            el.style.left = Math.max(0, t.clientX - dx) + 'px';
-            el.style.top = Math.max(0, t.clientY - dy) + 'px';
-        }, { passive: true });
-        document.addEventListener('mouseup', () => enCours = false);
-        document.addEventListener('touchend', () => enCours = false);
-        poignee.addEventListener('dblclick', () => basculerAgrandir(el.id));
-    }
+/* ---------- Galerie : filtres + grille ---------- */
+let filtre = "Tout";
+function afficherFiltres() {
+  $("#filtres").innerHTML = CATEGORIES.map((cat) => `
+    <button role="tab" aria-selected="${filtre === cat}" data-cat="${cat}" class="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium"
+      style="transition:all .5s cubic-bezier(.22,1,.36,1);color:${filtre === cat ? "#000" : "#A1A1AA"};background:${filtre === cat ? "#fff" : "transparent"};box-shadow:${filtre === cat ? "0 4px 18px rgba(255,255,255,.25)" : "none"}">${cat}</button>`).join("");
+}
+function afficherGrille() {
+  const liste = filtre === "Tout" ? CREATIONS : CREATIONS.filter((c) => c.categorie === filtre);
+  $("#grille-creations").innerHTML = liste.map((c, i) => `
+    <button data-id="${c.id}" aria-label="Ouvrir ${c.titre}" data-rv class="group text-left ${FORMATS[c.format].grille}">
+      <div class="lg-glass lg-spot tilt rounded-3xl p-1.5">
+        <div class="relative overflow-hidden rounded-[20px]" style="aspect-ratio:${FORMATS[c.format].ratio};background:linear-gradient(135deg,#1e1b4b,#0c4a6e)">
+          <img src="${c.image}" alt="${c.titre}" loading="lazy" onerror="this.style.opacity=0" class="h-full w-full object-cover transition-transform duration-[900ms] group-hover:scale-105"><span class="shine" aria-hidden="true"></span>
+          <div class="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-black/80 to-transparent p-3 pt-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+            <div><p class="text-sm font-semibold">${c.titre}</p><p class="text-xs text-white/60">${c.logiciels.join(" · ")}</p></div>${ico("max", 16)}
+          </div>
+        </div>
+      </div>
+    </button>`).join("");
+}
+$("#filtres").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-cat]"); if (!b) return;
+  filtre = b.dataset.cat; afficherFiltres(); afficherGrille();
+  revelerGrille($("#grille-creations")); // cartes qui réapparaissent en cascade
+});
+$("#grille-creations").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-id]"); if (b) ouvrir(CREATIONS.find((c) => c.id == b.dataset.id));
+});
+afficherFiltres(); afficherGrille();
 
-    function rendreRedimensionnable(el, poignee) {
-        let enCours = false, startX, startY, startW, startH;
-        poignee.addEventListener('mousedown', (e) => {
-            e.stopPropagation();
-            enCours = true;
-            startX = e.clientX; startY = e.clientY;
-            startW = el.offsetWidth; startH = el.offsetHeight;
-            mettreAuPremierPlan(el.id);
-        });
-        document.addEventListener('mousemove', (e) => {
-            if (!enCours) return;
-            el.style.width = Math.max(280, startW + (e.clientX - startX)) + 'px';
-            el.style.height = Math.max(160, startH + (e.clientY - startY)) + 'px';
-        });
-        document.addEventListener('mouseup', () => enCours = false);
-    }
+/* ---------- Lightbox ---------- */
+const lb = $("#lightbox");
+function ouvrir(c) {
+  $("#lb-img").src = c.image; $("#lb-img").alt = c.titre;
+  $("#lb-cat").textContent = c.categorie; $("#lb-titre").textContent = c.titre; $("#lb-desc").textContent = c.description;
+  $("#lb-logiciels").innerHTML = `<span class="mr-1 text-sm text-[#A1A1AA]">Logiciels utilisés :</span>` +
+    c.logiciels.map((l) => `<span class="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-medium">${l}</span>`).join("");
+  lb.classList.remove("hidden"); lb.classList.add("flex");
+  lb.style.animation = "fade .4s ease"; $("#lb-carte").style.animation = "pop .6s cubic-bezier(.22,1,.36,1)";
+  document.body.style.overflow = "hidden";
+}
+function fermer() { lb.classList.add("hidden"); lb.classList.remove("flex"); document.body.style.overflow = ""; }
+lb.addEventListener("click", (e) => { if (e.target === lb) fermer(); });
+$("#lb-fermer").addEventListener("click", fermer);
+document.addEventListener("keydown", (e) => e.key === "Escape" && fermer());
 
-    /* ---------- ICONES BUREAU ---------- */
-    document.querySelectorAll('.icone-bureau').forEach(ic => {
-        let dernierClic = 0;
-        ic.addEventListener('click', () => {
-            document.querySelectorAll('.icone-bureau').forEach(i => i.classList.remove('selectionnee'));
-            ic.classList.add('selectionnee');
-            const maintenant = Date.now();
-            if (maintenant - dernierClic < 400) ouvrirFenetre(ic.dataset.fenetre);
-            dernierClic = maintenant;
-        });
-        ic.addEventListener('keydown', (e) => { if (e.key === 'Enter') ouvrirFenetre(ic.dataset.fenetre); });
-    });
+/* ---------- Réseaux ---------- */
+$("#reseaux").innerHTML = RESEAUX.map((r) => `
+  <a href="${r.lien}" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-sm text-[#d4d4d8] transition-colors hover:bg-white/15 hover:text-white">${ico(r.icone, 16)} ${r.nom}</a>`).join("");
 
-    /* ---------- MENU DEMARRER ---------- */
-    const menuDemarrer = document.getElementById('menu-demarrer');
-    const boutonDemarrer = document.getElementById('bouton-demarrer');
-    boutonDemarrer.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menuDemarrer.style.display = menuDemarrer.style.display === 'flex' ? 'none' : 'flex';
-    });
-    document.querySelectorAll('#menu-demarrer .item-menu[data-fenetre]').forEach(item => {
-        item.addEventListener('click', () => {
-            ouvrirFenetre(item.dataset.fenetre);
-            menuDemarrer.style.display = 'none';
-        });
-    });
-    document.addEventListener('click', (e) => {
-        if (!menuDemarrer.contains(e.target) && e.target !== boutonDemarrer) {
-            menuDemarrer.style.display = 'none';
-        }
-    });
+/* ---------- Copier le lien + toast Dynamic Island ---------- */
+let minuteur;
+function toast(texte) {
+  const t = $("#toast"); $("#toast-texte").textContent = texte;
+  Object.assign(t.style, { width: "150px", padding: "0 16px", opacity: 1, transform: "none" });
+  clearTimeout(minuteur);
+  minuteur = setTimeout(() => Object.assign(t.style, { width: "36px", padding: "0", opacity: 0, transform: "translateY(-14px)" }), 2200);
+}
+$("#btn-copier").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(PROFIL.discord); }
+  catch { // Solution de secours si le presse-papiers est bloqué
+    const t = document.createElement("textarea"); t.value = PROFIL.discord; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove();
+  }
+  toast("Lien copié !");
+});
 
-    /* ---------- ARRET ---------- */
-    document.getElementById('item-arret').addEventListener('click', () => {
-        document.getElementById('ecran-arret').style.display = 'flex';
-        setTimeout(() => {
-            document.getElementById('ecran-arret').style.display = 'none';
-            menuDemarrer.style.display = 'none';
-        }, 2200);
-    });
+/* ---------- Icônes statiques et brillance du curseur ---------- */
+document.querySelectorAll("[data-ico]").forEach((el) => (el.innerHTML = ico(el.dataset.ico, +el.dataset.taille || 20)));
+document.addEventListener("mousemove", (e) => {
+  const c = e.target.closest && e.target.closest(".lg-spot"); if (!c) return;
+  const r = c.getBoundingClientRect();
+  c.style.setProperty("--mx", `${e.clientX - r.left}px`); c.style.setProperty("--my", `${e.clientY - r.top}px`);
+});
 
-    /* ---------- MENU CONTEXTUEL ---------- */
-    const menuCtx = document.getElementById('menu-contextuel');
-    document.getElementById('bureau').addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        menuCtx.style.left = e.clientX + 'px';
-        menuCtx.style.top = e.clientY + 'px';
-        menuCtx.style.display = 'block';
-    });
-    document.addEventListener('click', () => menuCtx.style.display = 'none');
-    document.getElementById('ctx-actualiser').addEventListener('click', () => location.reload());
-    document.getElementById('ctx-arranger').addEventListener('click', () => {
-        document.querySelector('.icones-bureau').style.transition = 'transform .2s';
-    });
-    document.getElementById('ctx-proprietes').addEventListener('click', () => ouvrirFenetre('fenetre-proprietes'));
+/* ══════════════════════════════════════════════════════════════
+   ANIMATIONS : entrée au chargement, scroll reveal, cascade, suivi de section
+   ══════════════════════════════════════════════════════════════ */
+const PAS = 80;        // ms entre deux cartes d'une grille (cascade)
+const PAS_ENTREE = 90; // ms entre deux éléments à l'arrivée sur la page
+const SECTIONS = ["apropos", "competences", "creations", "contact"];
 
-    /* ---------- VISIONNEUSE (galerie créations) ---------- */
-    const visionneuse = document.getElementById('visionneuse');
-    const imageVisionneuse = document.getElementById('image-visionneuse');
-    const legendeVisionneuse = document.getElementById('legende-visionneuse');
+/* 1) Entrée au chargement : navbar puis éléments du Hero, un par un */
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  document.querySelectorAll("[data-in]").forEach((el, i) => { el.style.setProperty("--d", i * PAS_ENTREE + "ms"); el.classList.add("go"); });
+}));
 
-    document.getElementById('bureau').addEventListener('click', (e) => {
-        const vignette = e.target.closest('.vignette-creation');
-        if (!vignette) return;
-        const img = vignette.querySelector('img');
-        imageVisionneuse.src = img.src;
-        legendeVisionneuse.textContent = vignette.dataset.titre || '';
-        visionneuse.style.display = 'flex';
-    });
-    document.getElementById('fermer-visionneuse').addEventListener('click', (e) => {
-        e.stopPropagation();
-        visionneuse.style.display = 'none';
-    });
-    visionneuse.addEventListener('click', (e) => {
-        if (e.target === visionneuse) visionneuse.style.display = 'none';
-    });
+/* 3) Cascade sur une grille : chaque carte apparaît 80ms après la précédente */
+function revelerGrille(grille) {
+  void grille.offsetWidth; // enregistre l'état de départ avant d'animer
+  [...grille.children].forEach((el, i) => { el.style.setProperty("--d", i * PAS + "ms"); el.classList.add("vu"); });
+}
 
-    /* ---------- FILTRES GALERIE (My Creations) ---------- */
-    document.getElementById('bureau').addEventListener('click', (e) => {
-        const filtre = e.target.closest('.filtre-creation');
-        if (!filtre) return;
-        const conteneur = filtre.closest('.corps-fenetre');
-        conteneur.querySelectorAll('.filtre-creation').forEach(b => b.classList.remove('actif'));
-        filtre.classList.add('actif');
-        const categorie = filtre.dataset.categorie;
-        conteneur.querySelectorAll('.vignette-creation').forEach(v => {
-            v.style.display = (categorie === 'all' || v.dataset.categorie === categorie) ? '' : 'none';
-        });
-    });
+/* 2) Scroll reveal : chaque élément apparaît en entrant dans l'écran */
+const OPTIONS = { threshold: 0.12, rootMargin: "0px 0px -6% 0px" };
+const obsElement = new IntersectionObserver((entrees) => entrees.forEach((en) => {
+  if (en.isIntersecting) { en.target.classList.add("vu"); obsElement.unobserve(en.target); }
+}), OPTIONS);
+document.querySelectorAll("[data-rv]").forEach((el) => { if (!el.closest("[data-grille]")) obsElement.observe(el); });
+const obsGrille = new IntersectionObserver((entrees) => entrees.forEach((en) => {
+  if (en.isIntersecting) { revelerGrille(en.target); obsGrille.unobserve(en.target); }
+}), { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
+document.querySelectorAll("[data-grille]").forEach((g) => obsGrille.observe(g));
 
-})();
+/* 4) Pilule de la navbar : suit la section visible */
+const pilule = $("#pilule");
+let courant = null, verrou = false, tVerrou, attente = false;
+function placerPilule(id) {
+  const a = $(`#onglets a[data-vue="${id}"]`); if (!a) return;
+  document.querySelectorAll("#onglets a").forEach((l) => l.removeAttribute("aria-current"));
+  a.setAttribute("aria-current", "page");
+  Object.assign(pilule.style, { width: a.offsetWidth + "px", height: a.offsetHeight + "px", transform: `translate(${a.offsetLeft}px, ${a.offsetTop}px)`, opacity: 1 });
+}
+function replacerPilule() { // sans animation (chargement, redimensionnement, police chargée)
+  pilule.style.transition = "none"; placerPilule(courant); void pilule.offsetWidth; pilule.style.transition = "";
+}
+function suivre() {
+  const repere = innerHeight * 0.4; // la section dont le haut a passé 40% de l'écran est la section active
+  let actif = SECTIONS[0];
+  SECTIONS.forEach((id) => { if ($("#" + id).getBoundingClientRect().top <= repere) actif = id; });
+  if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) actif = "contact"; // bas de page
+  if (actif !== courant) { courant = actif; placerPilule(actif); }
+}
+// Clic sur un lien d'ancre : la pilule file directement vers la cible pendant le défilement fluide
+document.addEventListener("click", (e) => {
+  const a = e.target.closest('a[href^="#"]'); if (!a) return;
+  const id = a.getAttribute("href").slice(1); if (!SECTIONS.includes(id)) return;
+  courant = id; placerPilule(id); verrou = true;
+  clearTimeout(tVerrou); tVerrou = setTimeout(() => { verrou = false; suivre(); }, 1200);
+});
+window.addEventListener("scroll", () => {
+  if (verrou) { clearTimeout(tVerrou); tVerrou = setTimeout(() => { verrou = false; suivre(); }, 150); return; }
+  if (attente) return; attente = true;
+  requestAnimationFrame(() => { attente = false; suivre(); });
+}, { passive: true });
+window.addEventListener("resize", () => replacerPilule());
+suivre(); replacerPilule();
+if (document.fonts) document.fonts.ready.then(replacerPilule);
+
+/* ══════════════════════════════════════════════════════════════
+   FINITIONS PREMIUM : inclinaison 3D, avant/après, orbe, progression
+   (le reflet de bordure du point 1 utilise le script « brillance du curseur » plus haut)
+   ══════════════════════════════════════════════════════════════ */
+
+/* 2) Inclinaison 3D douce des créations (souris uniquement) : max ±4° + reflet diagonal qui glisse */
+const grilleCreations = $("#grille-creations");
+const INCLINAISON = 8; // plus petit = plus subtil
+grilleCreations.addEventListener("pointermove", (e) => {
+  if (e.pointerType !== "mouse") return;
+  const c = e.target.closest(".tilt"); if (!c) return;
+  const r = c.getBoundingClientRect(), px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+  c.classList.add("actif");
+  c.style.setProperty("--ry", (px - 0.5) * INCLINAISON + "deg");
+  c.style.setProperty("--rx", (0.5 - py) * INCLINAISON + "deg");
+  c.style.setProperty("--ty", "-4px");
+  c.style.setProperty("--sp", ((1.5 - px) / 2) * 100 + "%"); // position du reflet selon le curseur
+});
+grilleCreations.addEventListener("pointerout", (e) => {
+  const c = e.target.closest(".tilt"); if (!c || c.contains(e.relatedTarget)) return;
+  c.classList.remove("actif");
+  ["--rx", "--ry", "--ty", "--sp"].forEach((v) => c.style.removeProperty(v)); // retour doux à plat
+});
+
+/* 3) Comparateur Avant / Après */
+const comparateur = $("#comparateur");
+$("#cmp-range").addEventListener("input", (e) => comparateur.style.setProperty("--pos", e.target.value + "%"));
+
+/* 4) Orbe ambiant : suit la souris avec inertie (le retard se règle avec INERTIE : plus petit = plus lent) */
+const orbe = $("#orbe"), INERTIE = 0.07;
+const cibleOrbe = { x: innerWidth / 2, y: innerHeight / 2 }, posOrbe = { ...cibleOrbe };
+let orbeActif = false;
+function animerOrbe() {
+  posOrbe.x += (cibleOrbe.x - posOrbe.x) * INERTIE; posOrbe.y += (cibleOrbe.y - posOrbe.y) * INERTIE;
+  orbe.style.transform = `translate3d(${posOrbe.x - 260}px, ${posOrbe.y - 260}px, 0)`;
+  if (Math.abs(cibleOrbe.x - posOrbe.x) + Math.abs(cibleOrbe.y - posOrbe.y) > 0.5) requestAnimationFrame(animerOrbe); else orbeActif = false;
+}
+function bougerOrbe(e) {
+  cibleOrbe.x = e.clientX; cibleOrbe.y = e.clientY;
+  if (!orbeActif) { orbeActif = true; requestAnimationFrame(animerOrbe); }
+}
+window.addEventListener("pointermove", bougerOrbe, { passive: true });
+window.addEventListener("pointerdown", bougerOrbe, { passive: true });
+animerOrbe(); orbe.style.opacity = 1;
+
+/* 5) Barre de progression du scroll */
+const barreProgression = $("#progression-barre");
+function majProgression() {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  barreProgression.style.transform = `scaleX(${max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0})`;
+}
+window.addEventListener("scroll", majProgression, { passive: true });
+window.addEventListener("resize", majProgression);
+majProgression();
 </script>
 </body>
 </html>
